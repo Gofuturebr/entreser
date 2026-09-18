@@ -1,0 +1,82 @@
+/* tokens.css — identidade visual Entre Ser (02-design-spec.md §3, §7)
+   Única fonte de cor/tipografia/raio/espaço do protótipo. Nenhum outro arquivo usa hex. */
+
+@import '@fontsource/comfortaa/600.css';
+@import '@fontsource/comfortaa/700.css';
+@import '@fontsource/mulish/400.css';
+@import '@fontsource/mulish/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+
+:root {
+  /* Cores de marca */
+  --cor-creme: #f8f0e8;
+  --cor-berinjela: #381830;
+  --cor-coral: #c83830;
+  --cor-verde-mar: #186860;
+  --cor-rose-1: #e8b8c0;
+  --cor-rose-2: #f0d8d0;
+  --grad-rose: linear-gradient(135deg, var(--cor-rose-1) 0%, var(--cor-rose-2) 100%);
+
+  /* Derivados (sempre a partir dos tokens acima) */
+  --cor-berinjela-suave: color-mix(in srgb, var(--cor-berinjela) 72%, transparent);
+  --cor-berinjela-linha: color-mix(in srgb, var(--cor-berinjela) 14%, transparent);
+  --cor-berinjela-vestigio: color-mix(in srgb, var(--cor-berinjela) 6%, transparent);
+  --cor-bolha-serena: color-mix(in srgb, var(--cor-berinjela) 92%, var(--cor-creme));
+  --cor-bolha-usuaria: color-mix(in srgb, var(--cor-rose-2) 65%, var(--cor-creme));
+  --cor-verde-mar-fundo: color-mix(in srgb, var(--cor-verde-mar) 10%, var(--cor-creme));
+  --cor-verde-mar-linha: color-mix(in srgb, var(--cor-verde-mar) 45%, transparent);
+  --cor-coral-fundo: color-mix(in srgb, var(--cor-coral) 10%, var(--cor-creme));
+  --cor-creme-escuro: color-mix(in srgb, var(--cor-creme) 92%, var(--cor-berinjela));
+  --cor-superficie: color-mix(in srgb, var(--cor-creme) 55%, white);
+  --cor-texto: var(--cor-berinjela);
+  --cor-texto-sobre-escuro: var(--cor-creme);
+  --cor-texto-suave: var(--cor-berinjela-suave);
+  --cor-foco: var(--cor-verde-mar);
+
+  /* Eixos (sinalização subliminar, 02-design-spec.md §3) */
+  --cor-eixo-entender: var(--cor-berinjela);
+  --cor-eixo-bem-estar: var(--cor-coral);
+  --cor-eixo-preparar: var(--cor-verde-mar);
+
+  /* Tipografia */
+  --fonte-titulo: 'Comfortaa', 'Nunito', system-ui, sans-serif;
+  --fonte-corpo: 'Mulish', system-ui, sans-serif;
+  --fonte-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --tam-corpo: 16px;
+  --tam-corpo-grande: 17px;
+  --tam-rotulo: 14px; /* só para rótulos curtos, nunca para corpo */
+  --tam-titulo: 24px;
+  --tam-titulo-pequeno: 19px;
+  --altura-linha: 1.5;
+  --peso-regular: 400;
+  --peso-semi: 600;
+  --peso-forte: 700;
+
+  /* Raios (a marca é curva) */
+  --raio-bolha: 22px;
+  --raio-bolha-canto: 6px;
+  --raio-card: 18px;
+  --raio-botao: 16px;
+  --raio-pilula: 999px;
+
+  /* Espaços */
+  --esp-1: 4px;
+  --esp-2: 8px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-5: 24px;
+  --esp-6: 32px;
+  --esp-7: 48px;
+
+  /* Ergonomia */
+  --alvo-toque: 44px;
+  --largura-bolha: 78%;
+  --largura-max: 430px;
+
+  /* Sombra e movimento */
+  --sombra-suave: 0 4px 18px color-mix(in srgb, var(--cor-berinjela) 10%, transparent);
+  --duracao-rapida: 180ms;
+  --duracao-lenta: 600ms;
+  --duracao-respiracao: 3.2s;
+  --curva: cubic-bezier(0.4, 0, 0.2, 1);
+}

@@ -1,0 +1,69 @@
+{
+  "aviso": "Respostas roteirizadas do mock de streaming (Fase 1–2, front-end). Imitam o que o agente diria sob o prompt controlado. Não são corpus chancelado e não vão para produção. As respostas de conteúdo clínico e de acolhimento vêm do corpus; aqui ficam só as costuras de conversa e os gatilhos de bancada.",
+  "tempos": { "primeiro_token_ms": 700, "intervalo_token_ms": 42, "demora_ms": 7000 },
+  "convite_card": "Quer ver um card rapidinho sobre isso?",
+  "convite_ferramenta": "Se fizer sentido, eu te entrego aqui um caminho curto para isso — sem obrigação.",
+  "respostas": [
+    {
+      "id": "saudacao",
+      "rota": "bem_estar",
+      "gatilhos": ["oi", "olá", "ola", "oie", "bom dia", "boa tarde", "boa noite", "cheguei", "to aqui", "tô aqui"],
+      "texto": "Oi{nome}. Tô aqui. Como está sendo o dia {dia} por aí — sem precisar organizar antes de contar?"
+    },
+    {
+      "id": "agradecimento",
+      "rota": "bem_estar",
+      "gatilhos": ["obrigada", "obrigado", "valeu", "ajudou"],
+      "texto": "De nada. Não precisa agradecer por ter companhia — é para isso que eu estou aqui. Pode voltar quando quiser, inclusive só para não dizer nada."
+    },
+    {
+      "id": "plano",
+      "rota": "preparar",
+      "gatilhos": ["plano", "organizar o dia", "organizar meu dia", "o que fazer hoje", "o que eu faço hoje", "não sei o que fazer", "nao sei o que fazer", "dia vazio", "ocupar a cabeça", "ocupar a cabeca"],
+      "texto": "Faz sentido querer dar alguma forma ao dia — a espera fica menos pesada quando o dia tem duas ou três coisas que são suas. Vamos escolher juntas?",
+      "ferramenta": { "nome": "plano_espera", "motivo": "usuária pediu ajuda para estruturar o dia" }
+    },
+    {
+      "id": "acordos",
+      "rota": "preparar",
+      "gatilhos": ["acordos", "meu marido", "minha esposa", "meu companheiro", "minha companheira", "meu namorado", "minha namorada", "combinar com ele", "combinar com ela", "quem vê o resultado", "quem ve o resultado"],
+      "texto": "O dia do exame costuma ser mais leve quando algumas coisas já foram combinadas antes, a dois. Eu tenho um passo a passo curtinho para isso — quer?",
+      "ferramenta": { "nome": "acordos_casal", "motivo": "usuária trouxe o tema do casal e do dia do exame" }
+    },
+    {
+      "id": "retomar_plano",
+      "rota": "bem_estar",
+      "requer_concluida": "plano_espera",
+      "gatilhos": ["fiz", "consegui", "deu certo", "voltei", "cheguei agora", "acabei de"],
+      "texto": "Que bom te ver de volta. Como foi {ancora} — daquele plano que você tinha combinado com você mesma?"
+    },
+    {
+      "id": "pessoa",
+      "rota": "preparar",
+      "gatilhos": ["falar com alguém", "falar com alguem", "falar com uma pessoa", "psicóloga", "psicologa", "terapeuta", "preciso de ajuda de verdade"],
+      "texto": "Claro. Tem gente de verdade do outro lado, e eu faço essa ponte agora.",
+      "ferramenta": { "nome": "ponte_humana", "motivo": "usuária pediu para falar com uma pessoa" }
+    }
+  ],
+  "bancada": {
+    "descricao": "Gatilhos de bancada para as fundadoras testarem estados do protótipo. Escrever exatamente o comando no chat.",
+    "comandos": {
+      "#erro": "simula indisponibilidade do modelo (estado de erro T5)",
+      "#demora": "simula primeiro token após 7 s (microcopy 'tô pensando com calma…')",
+      "#proibido": "simula resposta do modelo com vocabulário proibido (aciona o pós-filtro e registra incidente)",
+      "#inventada": "simula invocação de ferramenta fora do registry (ignorada + incidente)",
+      "#quebrado": "simula bloco <<FERRAMENTA>> malformado (ignorado + incidente; texto segue valendo)",
+      "#duplo": "invoca o Plano da Espera — com um widget já aberto, não renderiza e registra incidente",
+      "#ponte": "simula decisão do agente de acionar a Ponte Humana",
+      "#cardx": "simula card_id inexistente no corpus (ignorado + incidente)"
+    },
+    "respostas": {
+      "#proibido": "Eu sei que dá a sensação de que o ciclo falhou, mas ainda não há resposta nenhuma. Respira comigo?",
+      "#inventada": "Tenho uma coisa boa para esse momento. <<FERRAMENTA>>{\"nome\":\"meditacao_guiada\",\"motivo\":\"teste\"}<<FIM>>",
+      "#quebrado": "Vamos dar forma ao dia? <<FERRAMENTA>>{nome: plano_espera<<FIM>>",
+      "#duplo": "Vamos dar forma ao dia de hoje? <<FERRAMENTA>>{\"nome\":\"plano_espera\",\"motivo\":\"teste de widget duplicado\"}<<FIM>>",
+      "#ponte": "Eu li o que você escreveu e quero que você tenha uma pessoa de verdade agora. <<FERRAMENTA>>{\"nome\":\"ponte_humana\",\"motivo\":\"agente identificou risco\"}<<FIM>>",
+      "#cardx": "Tenho um card sobre isso. <<FERRAMENTA>>{\"nome\":\"card_micro\",\"card_id\":\"nao-existe-01\"}<<FIM>>"
+    }
+  }
+}
