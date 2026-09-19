@@ -46,6 +46,8 @@ export type Roteiro = {
 
 export type Faq = {
   id: string;
+  titulo?: string;
+  pergunta?: string;
   gatilhos: string[];
   resposta_base: string;
   fonte: string;
@@ -56,6 +58,8 @@ export type Faq = {
 
 export type Acolhimento = {
   contexto: string;
+  titulo?: string;
+  pergunta?: string;
   gatilhos: string[];
   frases_validadas: string[];
   card_id?: string;
@@ -85,11 +89,14 @@ export type Onboarding = {
   entrar: string;
 };
 
+export type EixoConteudo = { nome: string; subtitulo: string; descricao: string; status: string };
+
 export type Corpus = {
   versao: string;
   fase: string;
   aviso: string;
   vocabulario_proibido: string[];
+  eixos: Record<Eixo, EixoConteudo>;
   roteiros_diarios: Roteiro[];
   faq: Faq[];
   acolhimento: Acolhimento[];

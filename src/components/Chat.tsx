@@ -8,6 +8,7 @@ import type { Corpus, Perfil, Preferencias } from '../lib/types';
 import { Bolha } from './Bolha';
 import { Cabecalho } from './Cabecalho';
 import { ChipsFerramenta } from './ChipsFerramenta';
+import { FaixaEixos, FolhaEixo, type EixoConteudoAberto } from './EixosConteudo';
 import { Entrada } from './Entrada';
 import { Escrevendo } from './Escrevendo';
 import { EstadoErro } from './EstadoErro';
@@ -28,7 +29,7 @@ type Props = {
   aoRecomecar: () => void;
 };
 
-type FolhaAberta = 'travessia' | 'menu' | null;
+type FolhaAberta = 'travessia' | 'menu' | EixoConteudoAberto | null;
 
 export function Chat({ corpus, cliente, base, perfil, dia, preferencias, aoMudarDia, aoMudarPreferencias, aoRecomecar }: Props) {
   const nome = perfil.nome;
@@ -99,6 +100,7 @@ export function Chat({ corpus, cliente, base, perfil, dia, preferencias, aoMudar
         </div>
       ) : (
         <div className="rodape-chat">
+          <FaixaEixos corpus={corpus} desabilitado={serena.escrevendoDesde !== null} aoAbrir={setFolha} />
           <ChipsFerramenta corpus={corpus} dia={dia} widgetAtivo={serena.widgetAtivo} aoAbrir={serena.abrirFerramenta} />
           <Entrada placeholder={mc.placeholder_input ?? ''} desabilitado={serena.escrevendoDesde !== null} aoEnviar={serena.enviar} />
           <p className="disclaimer">{mc.disclaimer}</p>
@@ -108,6 +110,19 @@ export function Chat({ corpus, cliente, base, perfil, dia, preferencias, aoMudar
       {folha === 'travessia' && (
         <Folha titulo="a travessia" aoFechar={() => setFolha(null)} rotuloFechar={mc.fechar ?? 'fechar'}>
           <FolhaTravessia corpus={corpus} dia={dia} />
+        </Folha>
+      )}
+
+      {(folha === 'entender' || folha === 'bem_estar') && (
+        <Folha titulo={`${corpus.eixos[folha].nome} · ${corpus.eixos[folha].subtitulo}`} aoFechar={() => setFolha(null)} rotuloFechar={mc.fechar ?? 'fechar'}>
+          <FolhaEixo
+            corpus={corpus}
+            eixo={folha}
+            aoEscolher={(pergunta) => {
+              setFolha(null);
+              serena.enviar(pergunta);
+            }}
+          />
         </Folha>
       )}
 

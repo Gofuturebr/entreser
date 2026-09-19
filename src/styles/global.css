@@ -1084,3 +1084,101 @@ p {
   text-align: center;
   color: var(--cor-texto-suave);
 }
+
+/* ---------- Estrutura de conteúdo: Corpo · Coração ---------- */
+.eixos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--esp-2);
+  padding: var(--esp-3) var(--esp-4) 0;
+}
+
+.eixo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  min-height: 52px;
+  padding: var(--esp-2) var(--esp-3);
+  border-radius: var(--raio-botao);
+  background: var(--cor-berinjela-vestigio);
+  color: var(--cor-texto);
+  text-align: left;
+}
+
+.eixo__nome {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--fonte-titulo);
+  font-weight: var(--peso-forte);
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.eixo__ponto {
+  width: 9px;
+  height: 9px;
+  border-radius: var(--raio-pilula);
+}
+
+.eixo--entender .eixo__ponto {
+  background: var(--cor-eixo-entender);
+}
+
+.eixo--bem_estar .eixo__ponto {
+  background: var(--cor-eixo-bem-estar);
+}
+
+.eixo__sub {
+  color: var(--cor-texto-suave);
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.folha-eixo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+}
+
+.folha-eixo__descricao {
+  font-size: var(--tam-corpo-grande);
+  line-height: 1.55;
+}
+
+.folha-eixo__dica {
+  font-size: var(--tam-rotulo);
+  color: var(--cor-texto-suave);
+}
+
+.folha-eixo__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+.tema {
+  width: 100%;
+  text-align: left;
+  min-height: 52px;
+  padding: var(--esp-2) var(--esp-4);
+  border-radius: var(--raio-botao);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-berinjela-linha);
+  font-size: var(--tam-corpo);
+  box-shadow: inset 4px 0 0 var(--cor-berinjela-linha);
+}
+
+.tema--entender {
+  box-shadow: inset 4px 0 0 var(--cor-eixo-entender);
+}
+
+.tema--bem_estar {
+  box-shadow: inset 4px 0 0 var(--cor-eixo-bem-estar);
+}

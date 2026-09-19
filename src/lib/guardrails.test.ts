@@ -36,7 +36,9 @@ describe('o corpus de exemplo respeita o próprio vocabulário proibido', () => 
   it('nenhum texto exibível contém termo proibido', () => {
     const textos: string[] = [
       ...corpus.roteiros_diarios.map((r) => r.mensagem_proativa),
-      ...corpus.faq.map((f) => f.resposta_base),
+      ...corpus.faq.flatMap((f) => [f.resposta_base, f.titulo, f.pergunta]),
+      ...corpus.acolhimento.flatMap((a) => [a.titulo ?? '', a.pergunta ?? '']),
+      ...Object.values(corpus.eixos).flatMap((e) => [e.nome, e.subtitulo, e.descricao]),
       ...corpus.acolhimento.flatMap((a) => a.frases_validadas),
       ...corpus.ferramentas.flatMap((f) => f.passos.map((p) => p.texto)),
       ...corpus.cards_microlearning.flatMap((c) => [c.titulo, c.resumo_1_linha]),

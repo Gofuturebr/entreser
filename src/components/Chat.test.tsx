@@ -128,3 +128,21 @@ describe('Chat (Degrau B)', () => {
     expect(chips[0]).toHaveClass('chip--evidencia');
   });
 });
+
+describe('estrutura de conteúdo (Corpo · Coração)', () => {
+  beforeEach(() => {
+    storage.limparTudo();
+    Element.prototype.scrollIntoView = () => undefined;
+  });
+
+  it('faixa com os dois eixos; tocar num tema envia a pergunta e roteia', async () => {
+    montar();
+    expect(screen.getByRole('button', { name: /Corpo/ })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /Coração/ }));
+    expect(screen.getByRole('dialog', { name: /Coração · bem-estar emocional/ })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Medo do resultado' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByText('Estou com muito medo de dar negativo.')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getAllByText(/medo/).length).toBeGreaterThan(1));
+  });
+});

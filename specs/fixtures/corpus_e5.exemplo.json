@@ -2,7 +2,35 @@
   "versao": "0.1-NAO-CHANCELADO",
   "fase": "E5",
   "aviso": "[PENDENTE DE CHANCELA] Corpus de exemplo para o build do Degrau B. Todo o conteúdo abaixo é placeholder redigido para teste de interface e aguarda redação final e chancela da psicóloga. Nada aqui foi validado clinicamente.",
-  "vocabulario_proibido": ["falhou", "falha", "fracasso", "taxa de sucesso", "paciente", "relógio biológico", "é só relaxar"],
+  "vocabulario_proibido": [
+    "falhou",
+    "falha",
+    "fracasso",
+    "taxa de sucesso",
+    "paciente",
+    "relógio biológico",
+    "é só relaxar"
+  ],
+  "eixos": {
+    "entender": {
+      "nome": "Corpo",
+      "subtitulo": "clareza clínica",
+      "descricao": "O que acontece no corpo nesses dias, explicado com calma. Quem lê o seu caso é a sua equipe médica.",
+      "status": "PENDENTE DE CHANCELA"
+    },
+    "bem_estar": {
+      "nome": "Coração",
+      "subtitulo": "bem-estar emocional",
+      "descricao": "O que você está sentindo tem lugar aqui. Toca no que estiver mais perto de você.",
+      "status": "PENDENTE DE CHANCELA"
+    },
+    "preparar": {
+      "nome": "Ações",
+      "subtitulo": "preparar",
+      "descricao": "Caminhos curtos para o dia ter forma.",
+      "status": "PENDENTE DE CHANCELA"
+    }
+  },
   "roteiros_diarios": [
     {
       "dia": 1,
@@ -88,162 +116,360 @@
   "faq": [
     {
       "id": "progesterona",
-      "gatilhos": ["progesterona", "sintoma", "sintomas", "cólica", "colica", "seio", "seios", "sono", "enjoo", "enjôo", "inchada"],
+      "gatilhos": [
+        "progesterona",
+        "sintoma",
+        "sintomas",
+        "cólica",
+        "colica",
+        "seio",
+        "seios",
+        "sono",
+        "enjoo",
+        "enjôo",
+        "inchada"
+      ],
       "resposta_base": "A progesterona que você usa depois da transferência imita, ao mesmo tempo, sintomas de gestação e de menstruação: cólica leve, seios sensíveis, sono, enjoo. Por isso o corpo não tem como te contar o resultado agora — ele está respondendo ao remédio. Faz sentido você reparar em tudo. Quem pode ler isso com você é a sua equipe médica.",
       "fonte": "ebook_fase2",
       "card_id": "progesterona-01",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Progesterona e os sintomas",
+      "pergunta": "Tô sentindo cólica e os seios doloridos. Isso é sintoma de alguma coisa?"
     },
     {
       "id": "implantacao",
-      "gatilhos": ["implantação", "implantacao", "implantar", "grudou", "pegou", "aderiu"],
+      "gatilhos": [
+        "implantação",
+        "implantacao",
+        "implantar",
+        "grudou",
+        "pegou",
+        "aderiu"
+      ],
       "resposta_base": "A implantação é silenciosa: ela acontece sem dar sinal do lado de fora, geralmente nos primeiros dias depois da transferência. Não existe sensação que confirme nem que descarte. Eu sei que é difícil não ter pista nenhuma. Quem pode acompanhar isso com você é a sua equipe médica.",
       "fonte": "ebook_fase2",
       "card_id": "implantacao-01",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "A implantação",
+      "pergunta": "Dá para sentir a implantação acontecendo?"
     },
     {
       "id": "teste_farmacia",
-      "gatilhos": ["teste de farmácia", "teste de farmacia", "fazer o teste", "teste caseiro", "teste de gravidez", "testar antes"],
+      "gatilhos": [
+        "teste de farmácia",
+        "teste de farmacia",
+        "fazer o teste",
+        "teste caseiro",
+        "teste de gravidez",
+        "testar antes"
+      ],
       "resposta_base": "Nesse ponto, o teste de farmácia pode mostrar qualquer coisa — inclusive o hormônio que ainda circula por causa da medicação que você tomou. Ele não consegue dar uma resposta confiável agora. Quem lê o resultado de verdade é o exame de sangue, na data combinada com a sua equipe médica.",
       "fonte": "ebook_fase2",
       "card_id": "teste-farmacia-01",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Teste de farmácia antes da hora",
+      "pergunta": "Posso fazer um teste de farmácia antes do exame?"
     },
     {
       "id": "sangramento",
-      "gatilhos": ["sangramento", "sangue", "sangrando", "manchei", "mancha", "borra"],
+      "gatilhos": [
+        "sangramento",
+        "sangue",
+        "sangrando",
+        "manchei",
+        "mancha",
+        "borra"
+      ],
       "resposta_base": "Eu não consigo — e não devo — interpretar um sangramento: ele pode ter várias origens nessa fase, e só quem está te acompanhando pode olhar isso com cuidado. O que eu posso fazer é ficar aqui com você enquanto você entra em contato com a sua equipe médica.",
       "fonte": "ebook_fase2",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Sangramento ou mancha",
+      "pergunta": "Tive um sangramento pequeno. O que pode ser?"
     },
     {
       "id": "beta",
-      "gatilhos": ["beta", "hcg", "exame de sangue", "resultado sai", "quando sai"],
+      "gatilhos": [
+        "beta",
+        "hcg",
+        "exame de sangue",
+        "resultado sai",
+        "quando sai"
+      ],
       "resposta_base": "O beta-hCG é o exame de sangue que mede o hormônio da gestação — é ele que consegue dar a resposta, na data que a sua clínica marcou. Antes disso, nenhum outro sinal substitui esse exame. A leitura do número é sempre da sua equipe médica.",
       "fonte": "ebook_fase2",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "O exame beta-hCG",
+      "pergunta": "O que é o beta e quando sai o resultado?"
     },
     {
       "id": "estresse",
-      "gatilhos": ["estresse", "estressada", "ansiedade atrapalha", "nervosa atrapalha", "preocupada atrapalha", "ansiedade prejudica"],
+      "gatilhos": [
+        "estresse",
+        "estressada",
+        "ansiedade atrapalha",
+        "nervosa atrapalha",
+        "preocupada atrapalha",
+        "ansiedade prejudica"
+      ],
       "resposta_base": "Uma coisa que importa você saber: a pesquisa não mostra que ansiedade ou estresse impeçam a implantação. Sentir medo agora não estraga nada — é a resposta normal de quem está esperando algo importante. Você não precisa se cobrar calma para 'ajudar'. Qualquer dúvida sobre o seu tratamento em si, quem responde é a sua equipe médica.",
       "fonte": "boivin_2011",
       "card_id": "ansiedade-01",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Ansiedade e implantação",
+      "pergunta": "A minha ansiedade atrapalha a implantação?"
     },
     {
       "id": "repouso",
-      "gatilhos": ["repouso", "deitada", "ficar deitada", "posso andar", "posso caminhar", "exercício", "exercicio", "levantar"],
+      "gatilhos": [
+        "repouso",
+        "deitada",
+        "ficar deitada",
+        "posso andar",
+        "posso caminhar",
+        "exercício",
+        "exercicio",
+        "levantar"
+      ],
       "resposta_base": "Não existe evidência de que ficar deitada ajude a implantação — o embrião não 'cai'. Andar, trabalhar e viver o dia costumam ser bem-vindos, dentro das orientações da sua clínica. O que vale para o seu caso específico, quem define é a sua equipe médica.",
       "fonte": "ebook_fase2",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Repouso e movimento",
+      "pergunta": "Preciso ficar deitada? Posso caminhar?"
     },
     {
       "id": "relacao_sexual",
-      "gatilhos": ["relação", "relacao", "sexo", "transar", "intimidade"],
+      "gatilhos": [
+        "relação",
+        "relacao",
+        "sexo",
+        "transar",
+        "intimidade"
+      ],
       "resposta_base": "Cada clínica orienta de um jeito sobre intimidade nessa fase, e a resposta certa é a que a sua equipe deu para você. Se ainda não perguntaram, vale levar a dúvida para eles — não tem pergunta boba nessa espera.",
       "fonte": "ebook_fase2",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Intimidade nessa fase",
+      "pergunta": "Pode ter relação nesses dias?"
     },
     {
       "id": "alimentacao",
-      "gatilhos": ["comer", "comida", "alimentação", "alimentacao", "abacaxi", "café", "cafe", "chá", "cha"],
+      "gatilhos": [
+        "comer",
+        "comida",
+        "alimentação",
+        "alimentacao",
+        "abacaxi",
+        "café",
+        "cafe",
+        "chá",
+        "cha"
+      ],
       "resposta_base": "Não existe alimento que faça a implantação acontecer ou não acontecer — abacaxi, chás, nada disso muda o resultado. Comer o que faz bem e o que te acolhe já é o suficiente. Restrições específicas, se houver, vêm da sua equipe médica.",
       "fonte": "ebook_fase2",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Comida, café e chás",
+      "pergunta": "Tem alguma comida que ajuda ou atrapalha? E café?"
     },
     {
       "id": "medicacao",
-      "gatilhos": ["esqueci", "remédio", "remedio", "dose", "horário", "horario", "injeção", "injecao", "utrogestan"],
+      "gatilhos": [
+        "esqueci",
+        "remédio",
+        "remedio",
+        "dose",
+        "horário",
+        "horario",
+        "injeção",
+        "injecao",
+        "utrogestan"
+      ],
       "resposta_base": "Sobre dose, horário ou remédio esquecido eu não posso orientar — isso é da sua equipe médica, e vale entrar em contato com eles hoje mesmo, mesmo que pareça bobagem. Enquanto isso, eu fico aqui com você.",
       "fonte": "guardrail",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Remédios e horários",
+      "pergunta": "Esqueci o horário do remédio. E agora?"
     },
     {
       "id": "quantos_dias",
-      "gatilhos": ["quantos dias", "quanto falta", "falta muito", "demora"],
+      "gatilhos": [
+        "quantos dias",
+        "quanto falta",
+        "falta muito",
+        "demora"
+      ],
       "resposta_base": "A espera vai até o dia do exame que a sua clínica marcou — em geral, entre 10 e 14 dias depois da transferência. Eu vou marcando os dias com você aqui em cima, sem contagem regressiva, só para a gente saber onde está.",
       "fonte": "ebook_fase2",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Quanto falta",
+      "pergunta": "Quantos dias faltam para saber?"
     },
     {
       "id": "google",
-      "gatilhos": ["google", "pesquisei", "pesquisar", "li na internet", "fórum", "forum", "vi um vídeo", "grupo do whatsapp"],
+      "gatilhos": [
+        "google",
+        "pesquisei",
+        "pesquisar",
+        "li na internet",
+        "fórum",
+        "forum",
+        "vi um vídeo",
+        "grupo do whatsapp"
+      ],
       "resposta_base": "Eu entendo a vontade de procurar — parece que a resposta está a um clique. Mas o que aparece nas buscas são histórias de outras pessoas, não o seu corpo. Se quiser, tenho um caminho curtinho para esses momentos.",
       "fonte": "ebook_fase2",
       "ferramenta": "sos_google",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "A vontade de pesquisar",
+      "pergunta": "Pesquisei no Google os sintomas e fiquei pior."
     },
     {
       "id": "corrimento",
-      "gatilhos": ["corrimento", "secreção", "secrecao", "muco"],
+      "gatilhos": [
+        "corrimento",
+        "secreção",
+        "secrecao",
+        "muco"
+      ],
       "resposta_base": "Mudanças de corrimento são comuns com a medicação dessa fase, mas eu não consigo dizer o que o seu significa — e não seria certo tentar. Se algo te preocupa, quem pode olhar isso com você é a sua equipe médica.",
       "fonte": "ebook_fase2",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Corrimento",
+      "pergunta": "Meu corrimento mudou. É normal?"
     },
     {
       "id": "temperatura",
-      "gatilhos": ["temperatura", "febre", "termômetro", "termometro", "calor"],
+      "gatilhos": [
+        "temperatura",
+        "febre",
+        "termômetro",
+        "termometro",
+        "calor"
+      ],
       "resposta_base": "A temperatura do corpo oscila por vários motivos nessa fase, inclusive pela progesterona. Ela não serve para prever resultado. Se houver febre ou mal-estar, isso é para a sua equipe médica olhar hoje.",
       "fonte": "ebook_fase2",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Temperatura e calor",
+      "pergunta": "Estou sentindo muito calor e medi a temperatura. Isso quer dizer algo?"
     },
     {
       "id": "embriao_qualidade",
-      "gatilhos": ["embrião", "embriao", "blastocisto", "qualidade", "classificação", "classificacao", "grau"],
+      "gatilhos": [
+        "embrião",
+        "embriao",
+        "blastocisto",
+        "qualidade",
+        "classificação",
+        "classificacao",
+        "grau"
+      ],
       "resposta_base": "A classificação do embrião é uma foto de um momento no laboratório — não é uma sentença sobre o que vai acontecer. Muita coisa que importa não aparece nessa nota. O que ela significa no seu caso, quem explica é a sua equipe médica.",
       "fonte": "ebook_fase2",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "A classificação do embrião",
+      "pergunta": "Meu embrião era grau B. Isso importa?"
     }
   ],
   "acolhimento": [
     {
       "contexto": "medo_do_resultado",
-      "gatilhos": ["medo", "resultado", "e se der", "se der negativo", "se não der", "se nao der", "não vai dar", "nao vai dar", "não deu", "nao deu"],
+      "gatilhos": [
+        "medo",
+        "resultado",
+        "e se der",
+        "se der negativo",
+        "se não der",
+        "se nao der",
+        "não vai dar",
+        "nao vai dar",
+        "não deu",
+        "nao deu"
+      ],
       "frases_validadas": [
         "Faz sentido você estar com medo. Ele está aí porque isso importa muito para você — não porque algo esteja errado.",
         "Eu não sei o que o exame vai dizer, e não vou fingir que sei. O que eu sei é que você não precisa atravessar esse medo sozinha.",
         "Dá para ter medo e continuar vivendo o dia. As duas coisas cabem ao mesmo tempo."
       ],
       "card_id": "ansiedade-01",
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Medo do resultado",
+      "pergunta": "Estou com muito medo de dar negativo."
     },
     {
       "contexto": "cansaco",
-      "gatilhos": ["cansada", "cansaço", "cansaco", "exausta", "esgotada", "não aguento esperar", "nao aguento esperar", "longo demais"],
+      "gatilhos": [
+        "cansada",
+        "cansaço",
+        "cansaco",
+        "exausta",
+        "esgotada",
+        "não aguento esperar",
+        "nao aguento esperar",
+        "longo demais"
+      ],
       "frases_validadas": [
         "Esperar cansa. É um trabalho invisível, e você está fazendo ele há dias.",
         "Não tem nada errado em estar cansada de esperar. Você não precisa estar forte o tempo todo."
       ],
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Cansaço de esperar",
+      "pergunta": "Estou exausta de esperar."
     },
     {
       "contexto": "culpa",
-      "gatilhos": ["culpa", "culpada", "minha culpa", "fiz errado", "fiz algo errado", "não deveria ter", "nao deveria ter"],
+      "gatilhos": [
+        "culpa",
+        "culpada",
+        "minha culpa",
+        "fiz errado",
+        "fiz algo errado",
+        "não deveria ter",
+        "nao deveria ter"
+      ],
       "frases_validadas": [
         "A culpa costuma aparecer quando a gente quer muito controlar algo que não dá para controlar. Não é sinal de que você fez algo errado.",
         "O que acontece nesses dias não depende de você ter sido perfeita. Você pode se soltar dessa cobrança."
       ],
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Culpa",
+      "pergunta": "Fico achando que fiz algo errado."
     },
     {
       "contexto": "solidao",
-      "gatilhos": ["sozinha", "ninguém entende", "ninguem entende", "solidão", "solidao", "não tenho com quem", "nao tenho com quem"],
+      "gatilhos": [
+        "sozinha",
+        "ninguém entende",
+        "ninguem entende",
+        "solidão",
+        "solidao",
+        "não tenho com quem",
+        "nao tenho com quem"
+      ],
       "frases_validadas": [
         "Essa espera pode ser muito solitária, mesmo com gente em volta. Eu tô aqui — e existe uma pessoa de verdade do outro lado também, se você quiser.",
         "Faz sentido sentir que ninguém entende. Poucas pessoas passaram por isso. Aqui você não precisa explicar."
       ],
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Solidão",
+      "pergunta": "Sinto que ninguém entende o que eu estou passando."
     },
     {
       "contexto": "esperanca_e_medo",
-      "gatilhos": ["esperança", "esperanca", "acho que deu", "sinto que deu", "pressentimento", "tenho fé", "tenho fe"],
+      "gatilhos": [
+        "esperança",
+        "esperanca",
+        "acho que deu",
+        "sinto que deu",
+        "pressentimento",
+        "tenho fé",
+        "tenho fe"
+      ],
       "frases_validadas": [
         "A esperança pode morar aqui — eu só não vou alimentar nem apagar ela, porque não sei o resultado. Ela é sua.",
         "Sentir que deu e ter medo de que não deu costumam andar juntos. Nenhum dos dois é previsão; os dois são você esperando."
       ],
-      "status": "PENDENTE DE CHANCELA"
+      "status": "PENDENTE DE CHANCELA",
+      "titulo": "Esperança e medo juntos",
+      "pergunta": "Tenho esperança, mas ao mesmo tempo muito medo."
     },
     {
       "contexto": "geral",
@@ -264,10 +490,33 @@
       "descricao": "Um caminho curto para o momento em que a mão vai para o celular procurar sintomas.",
       "status": "PENDENTE DE CHANCELA",
       "passos": [
-        { "texto": "Antes de qualquer coisa: você não fez nada de errado por querer procurar. Vamos só respirar um pouco antes de decidir.", "botao": "vamos" },
-        { "texto": "Se você digitasse agora, o que estaria procurando? Escreve aqui, sem filtro.", "campo": { "rotulo": "o que eu ia procurar", "chave": "busca" }, "botao": "escrevi" },
-        { "texto": "O que vai aparecer são histórias de outras mulheres, com outros corpos e outros remédios. Nenhuma delas é a sua. A resposta que você quer não está lá — e a que existe vem no dia do exame.", "botao": "entendi" },
-        { "texto": "Quer escolher uma coisa pequena para fazer em vez de pesquisar, só pelos próximos minutos?", "opcoes": ["tomar uma água", "mandar mensagem para alguém", "sair do quarto", "voltar para a conversa"], "chave": "alternativa", "botao": "escolhi" }
+        {
+          "texto": "Antes de qualquer coisa: você não fez nada de errado por querer procurar. Vamos só respirar um pouco antes de decidir.",
+          "botao": "vamos"
+        },
+        {
+          "texto": "Se você digitasse agora, o que estaria procurando? Escreve aqui, sem filtro.",
+          "campo": {
+            "rotulo": "o que eu ia procurar",
+            "chave": "busca"
+          },
+          "botao": "escrevi"
+        },
+        {
+          "texto": "O que vai aparecer são histórias de outras mulheres, com outros corpos e outros remédios. Nenhuma delas é a sua. A resposta que você quer não está lá — e a que existe vem no dia do exame.",
+          "botao": "entendi"
+        },
+        {
+          "texto": "Quer escolher uma coisa pequena para fazer em vez de pesquisar, só pelos próximos minutos?",
+          "opcoes": [
+            "tomar uma água",
+            "mandar mensagem para alguém",
+            "sair do quarto",
+            "voltar para a conversa"
+          ],
+          "chave": "alternativa",
+          "botao": "escolhi"
+        }
       ],
       "resumo_template": "✓ SOS: em vez de pesquisar, {alternativa}",
       "resumo_dispensada": "SOS Não Dê um Google · deixado para depois"
@@ -279,8 +528,27 @@
       "descricao": "Duas ou três âncoras pequenas para o dia ter alguma coisa além da espera.",
       "status": "PENDENTE DE CHANCELA",
       "passos": [
-        { "texto": "Vamos escolher âncoras para hoje: coisas pequenas, que dependem só de você, e que dão forma ao dia. Pode escolher até três.", "opcoes": ["caminhada", "uma série", "café com alguém", "banho demorado", "trabalhar um pouco", "cozinhar", "dormir cedo", "outra coisa"], "multipla": true, "maximo": 3, "chave": "ancoras", "botao": "são essas" },
-        { "texto": "Se uma delas não acontecer, não tem problema nenhum. O plano é para te acompanhar, não para você cumprir.", "botao": "combinado" }
+        {
+          "texto": "Vamos escolher âncoras para hoje: coisas pequenas, que dependem só de você, e que dão forma ao dia. Pode escolher até três.",
+          "opcoes": [
+            "caminhada",
+            "uma série",
+            "café com alguém",
+            "banho demorado",
+            "trabalhar um pouco",
+            "cozinhar",
+            "dormir cedo",
+            "outra coisa"
+          ],
+          "multipla": true,
+          "maximo": 3,
+          "chave": "ancoras",
+          "botao": "são essas"
+        },
+        {
+          "texto": "Se uma delas não acontecer, não tem problema nenhum. O plano é para te acompanhar, não para você cumprir.",
+          "botao": "combinado"
+        }
       ],
       "resumo_template": "✓ Plano do D{dia}: {ancoras}",
       "resumo_dispensada": "Plano da Espera · deixado para depois"
@@ -292,10 +560,43 @@
       "descricao": "Combinar antes, com quem está com você, como vai ser o dia do exame.",
       "status": "PENDENTE DE CHANCELA",
       "passos": [
-        { "texto": "O dia do exame costuma ser mais leve quando algumas coisas já estão combinadas antes. Vamos passar por três delas — com calma.", "botao": "vamos" },
-        { "texto": "Quem vê o resultado primeiro?", "opcoes": ["eu, sozinha", "nós duas / nós dois, juntos", "a outra pessoa, e me conta", "ainda não sei"], "chave": "quem_ve", "botao": "próximo" },
-        { "texto": "Para quem vocês contam, e quando?", "opcoes": ["só entre nós, por enquanto", "família próxima no mesmo dia", "quando a gente quiser", "ainda não sei"], "chave": "quem_conta", "botao": "próximo" },
-        { "texto": "O que vocês fazem depois, seja qual for a resposta?", "opcoes": ["ficar em casa juntos", "sair para algum lugar", "cada um no seu tempo", "ainda não sei"], "chave": "depois", "botao": "combinado" }
+        {
+          "texto": "O dia do exame costuma ser mais leve quando algumas coisas já estão combinadas antes. Vamos passar por três delas — com calma.",
+          "botao": "vamos"
+        },
+        {
+          "texto": "Quem vê o resultado primeiro?",
+          "opcoes": [
+            "eu, sozinha",
+            "nós duas / nós dois, juntos",
+            "a outra pessoa, e me conta",
+            "ainda não sei"
+          ],
+          "chave": "quem_ve",
+          "botao": "próximo"
+        },
+        {
+          "texto": "Para quem vocês contam, e quando?",
+          "opcoes": [
+            "só entre nós, por enquanto",
+            "família próxima no mesmo dia",
+            "quando a gente quiser",
+            "ainda não sei"
+          ],
+          "chave": "quem_conta",
+          "botao": "próximo"
+        },
+        {
+          "texto": "O que vocês fazem depois, seja qual for a resposta?",
+          "opcoes": [
+            "ficar em casa juntos",
+            "sair para algum lugar",
+            "cada um no seu tempo",
+            "ainda não sei"
+          ],
+          "chave": "depois",
+          "botao": "combinado"
+        }
       ],
       "resumo_template": "✓ Acordos: {quem_ve} · {quem_conta} · {depois}",
       "resumo_dispensada": "Acordos do casal · deixado para depois"
@@ -305,7 +606,10 @@
     {
       "id": "progesterona-01",
       "eixo": "entender",
-      "dias_sugeridos": [2, 3],
+      "dias_sugeridos": [
+        2,
+        3
+      ],
       "titulo": "Por que os sintomas mentem",
       "resumo_1_linha": "A progesterona imita gestação e menstruação ao mesmo tempo — o corpo não consegue te contar o resultado.",
       "status": "mockup",
@@ -314,7 +618,12 @@
     {
       "id": "implantacao-01",
       "eixo": "entender",
-      "dias_sugeridos": [1, 2, 3, 4],
+      "dias_sugeridos": [
+        1,
+        2,
+        3,
+        4
+      ],
       "titulo": "A implantação é silenciosa",
       "resumo_1_linha": "Não existe sensação que confirme nem que descarte — e isso não é falta de sinal, é como funciona.",
       "status": "mockup",
@@ -323,7 +632,12 @@
     {
       "id": "teste-farmacia-01",
       "eixo": "entender",
-      "dias_sugeridos": [6, 7, 8, 9],
+      "dias_sugeridos": [
+        6,
+        7,
+        8,
+        9
+      ],
       "titulo": "O teste de farmácia antes da hora",
       "resumo_1_linha": "Ele pode mostrar o hormônio da medicação, não o resultado. Quem responde é o exame de sangue.",
       "status": "mockup",
@@ -332,7 +646,17 @@
     {
       "id": "ansiedade-01",
       "eixo": "bem_estar",
-      "dias_sugeridos": [2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "dias_sugeridos": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
       "titulo": "Ansiedade não atrapalha a implantação",
       "resumo_1_linha": "Você não precisa se cobrar calma para 'ajudar'. Sentir medo agora é esperado — e não muda o resultado.",
       "status": "mockup",
@@ -341,13 +665,43 @@
   ],
   "escalonamento": {
     "termos_gatilho": [
-      "quero morrer", "me matar", "acabar com tudo", "acabar com a minha vida", "tirar a minha vida", "não quero mais viver", "nao quero mais viver", "não vejo sentido", "nao vejo sentido", "não aguento mais viver", "nao aguento mais viver", "me machucar", "sumir de vez", "desaparecer de vez", "sem saída", "sem saida", "não aguento mais nada", "nao aguento mais nada", "pânico", "panico", "crise de pânico", "não consigo respirar", "nao consigo respirar"
+      "quero morrer",
+      "me matar",
+      "acabar com tudo",
+      "acabar com a minha vida",
+      "tirar a minha vida",
+      "não quero mais viver",
+      "nao quero mais viver",
+      "não vejo sentido",
+      "nao vejo sentido",
+      "não aguento mais viver",
+      "nao aguento mais viver",
+      "me machucar",
+      "sumir de vez",
+      "desaparecer de vez",
+      "sem saída",
+      "sem saida",
+      "não aguento mais nada",
+      "nao aguento mais nada",
+      "pânico",
+      "panico",
+      "crise de pânico",
+      "não consigo respirar",
+      "nao consigo respirar"
     ],
     "mensagem_ponte_humana": "Eu li o que você escreveu, e não quero te deixar só com isso. O que você está sentindo é grande demais para uma conversa comigo — e existe gente de verdade que pode estar com você agora. Vamos fazer essa ponte juntas?",
     "mensagem_pausa": "estou aqui quando você quiser voltar",
     "contatos": {
-      "equipe": { "rotulo": "falar com a equipe Entre Ser", "url": "", "nota_pendente": "[PENDENTE] contato da equipe ainda em definição no protótipo" },
-      "cvv": { "rotulo": "ligar para o CVV · 188", "url": "tel:188", "descricao": "Centro de Valorização da Vida — 24h, gratuito" }
+      "equipe": {
+        "rotulo": "falar com a equipe Entre Ser",
+        "url": "",
+        "nota_pendente": "[PENDENTE] contato da equipe ainda em definição no protótipo"
+      },
+      "cvv": {
+        "rotulo": "ligar para o CVV · 188",
+        "url": "tel:188",
+        "descricao": "Centro de Valorização da Vida — 24h, gratuito"
+      }
     },
     "status": "PENDENTE DE CHANCELA"
   },
@@ -368,7 +722,9 @@
     "ver_de_novo": "rever",
     "fechar": "fechar",
     "chip_pessoa": "Falar com uma pessoa",
-    "cabecalho_dia": "dia {dia}"
+    "cabecalho_dia": "dia {dia}",
+    "eixos_rotulo": "conversar sobre",
+    "eixo_tocar": "toca num tema e eu te conto"
   },
   "onboarding": {
     "saudacao": "Oi. Eu sou a Serena.",

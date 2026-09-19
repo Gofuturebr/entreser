@@ -18,6 +18,7 @@ Outros comandos: `npm run build`, `npm run preview`, `npm run test`, `npm run li
 - **Percorrer os 10 dias:** `?dia=N` na URL (ex. `http://localhost:5173/?dia=6`) força o dia. Ou toque longo (0,6 s) na concha do cabeçalho → bancada de teste → escolher D1–D10.
 - **Onboarding:** aparece só na primeira visita (nome opcional + dia da espera). "Recomeçar do zero" na bancada apaga tudo do aparelho.
 - **Hipóteses de design** (bancada): marcador da travessia **A · texto** vs. **B · pedras**; fio de cor por rota **com/sem**.
+- **Estrutura de conteúdo:** a faixa **Corpo · clareza clínica** / **Coração · bem-estar emocional** acima dos chips abre a lista de temas do corpus; tocar num tema envia a pergunta para a Serena (rotas Entender e Bem-Estar). As Ações (Preparar) são os chips.
 - **Ferramentas:** chips acima do input (SOS Não dê um Google · Meu plano de hoje · Acordos do casal · Falar com uma pessoa) abrem o widget direto, sem passar pelo mock. A Serena também as oferece na conversa (ex.: "não sei o que fazer hoje", "meu marido", "pesquisei no google").
 - **Cards de microlearning:** perguntas de Entender (ex.: "tô com cólica", "posso fazer o teste de farmácia?", "ansiedade atrapalha?") terminam com convite + card inline.
 - **Ponte Humana:** qualquer termo-gatilho do corpus (ex.: "não aguento mais nada", "quero morrer") curto-circuita sem chamar o mock; o chip "Falar com uma pessoa" e o comando `#ponte` (decisão do agente) também acionam.
@@ -53,7 +54,8 @@ src/
   App.tsx                   # carrega corpus em runtime, onboarding → chat
   components/               # Bolha, Cabecalho, ChipsFerramenta, Entrada, Escrevendo, EstadoErro,
                             # WidgetFerramenta, ResumoFerramenta, CardMicrolearning, CardPonteHumana,
-                            # Travessia (2 variações + folha), Onboarding, MenuTeste, Folha, Chat
+                            # Travessia (2 variações + folha), EixosConteudo (Corpo/Coração),
+                            # Onboarding, MenuTeste, Folha, Chat
   lib/
     types.ts                # corpus + timeline tipada (texto | ferramenta | resumo_ferramenta | erro)
     corpus.ts               # carga/validação em runtime; templates
