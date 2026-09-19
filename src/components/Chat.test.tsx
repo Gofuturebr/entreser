@@ -56,9 +56,12 @@ describe('Chat (Degrau B)', () => {
 
   it('chip abre widget; segunda invocação não renderiza e registra incidente (10b); concluir vira resumo (10c)', async () => {
     montar();
-    await userEvent.click(screen.getByRole('button', { name: /Meu plano de hoje/ }));
+    await userEvent.click(screen.getByRole('button', { name: 'Cuidar' }));
+    await userEvent.click(screen.getByRole('button', { name: 'abrir Meu Plano da Espera' }));
     expect(screen.getByRole('region', { name: 'Meu Plano da Espera' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /SOS Não dê um Google/ })).toBeDisabled();
+    await userEvent.click(screen.getByRole('button', { name: 'Cuidar' }));
+    expect(screen.getByRole('button', { name: 'abrir SOS Não Dê um Google' })).toBeDisabled();
+    await userEvent.click(screen.getByRole('button', { name: 'fechar' }));
 
     await userEvent.type(campo(), '#duplo{enter}');
     await waitFor(() => expect(screen.getByText(/Vamos dar forma ao dia de hoje\?/)).toBeInTheDocument());
@@ -74,7 +77,8 @@ describe('Chat (Degrau B)', () => {
 
   it('"agora não" colapsa em resumo de dispensa', async () => {
     montar();
-    await userEvent.click(screen.getByRole('button', { name: /SOS Não dê um Google/ }));
+    await userEvent.click(screen.getByRole('button', { name: 'Cuidar' }));
+    await userEvent.click(screen.getByRole('button', { name: 'abrir SOS Não Dê um Google' }));
     await userEvent.click(screen.getByRole('button', { name: 'agora não' }));
     expect(screen.getByText(/deixado para depois/)).toBeInTheDocument();
     expect(storage.lerDispensadas()).toContain('sos_google');
@@ -121,28 +125,45 @@ describe('Chat (Degrau B)', () => {
     expect(screen.getByRole('button', { name: 'tentar de novo' })).toBeInTheDocument();
   });
 
-  it('D10: chip Acordos do casal em evidência', () => {
+  it('D10: chip Cuidar em evidência e Acordos em primeiro na trilha', async () => {
     montar(10);
-    const chips = screen.getAllByRole('button', { name: /Acordos do casal|SOS|Meu plano|Falar com/ });
-    expect(chips[0]).toHaveTextContent('Acordos do casal');
-    expect(chips[0]).toHaveClass('chip--evidencia');
+    expect(screen.getByRole('button', { name: 'Cuidar' })).toHaveClass('chip--evidencia');
+    await userEvent.click(screen.getByRole('button', { name: 'Cuidar' }));
+    const titulos = screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent);
+    expect(titulos[0]).toBe('Acordos para o dia do teste');
+  });
+
+  it('chip Falar com uma pessoa abre a Ponte Humana direto', async () => {
+    montar();
+    await userEvent.click(screen.getByRole('button', { name: 'Falar com uma pessoa' }));
+    expect(screen.getByRole('region', { name: 'Ponte Humana' })).toBeInTheDocument();
   });
 });
 
-describe('estrutura de conteúdo (Corpo · Coração)', () => {
+describe('trilhas (Entender · Bem-estar · Cuidar)', () => {
   beforeEach(() => {
     storage.limparTudo();
     Element.prototype.scrollIntoView = () => undefined;
   });
 
-  it('faixa com os dois eixos; tocar num tema envia a pergunta e roteia', async () => {
+  it('três chips numa linha; a tela da trilha mostra seções com explicação, base e temas', async () => {
     montar();
-    expect(screen.getByRole('button', { name: /Corpo/ })).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: /Coração/ }));
-    expect(screen.getByRole('dialog', { name: /Coração · bem-estar emocional/ })).toBeInTheDocument();
+    for (const nome of ['Entender', 'Bem-estar', 'Cuidar']) expect(screen.getByRole('button', { name: nome })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Bem-estar' }));
+    const tela = screen.getByRole('dialog', { name: /Bem-estar · clareza começa no acolhimento/ });
+    expect(tela).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'O fim da positividade tóxica' })).toBeInTheDocument();
+    expect(screen.getAllByText('o que este conteúdo aborda').length).toBeGreaterThan(0);
     await userEvent.click(screen.getByRole('button', { name: 'Medo do resultado' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByText('Estou com muito medo de dar negativo.')).toBeInTheDocument();
     await waitFor(() => expect(screen.getAllByText(/medo/).length).toBeGreaterThan(1));
+  });
+
+  it('ver o card a partir da trilha insere o card inline', async () => {
+    montar();
+    await userEvent.click(screen.getByRole('button', { name: 'Entender' }));
+    await userEvent.click(screen.getByRole('button', { name: /ver o card: A implantação é silenciosa/ }));
+    expect(screen.getByRole('article', { name: /A implantação é silenciosa/ })).toBeInTheDocument();
   });
 });

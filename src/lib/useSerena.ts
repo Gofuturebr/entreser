@@ -205,6 +205,11 @@ export function useSerena({ corpus, cliente, dia, nome }: Params) {
     [tratarInvocacao],
   );
 
+  const abrirCard = useCallback(
+    (cardId: string) => tratarInvocacao({ nome: 'card_micro', params: { card_id: cardId } }, 'chip'),
+    [tratarInvocacao],
+  );
+
   const concluirFerramenta = useCallback(
     (idMsg: string, resultado: Record<string, unknown>, dispensada: boolean) => {
       atualizar((t) =>
@@ -236,5 +241,5 @@ export function useSerena({ corpus, cliente, dia, nome }: Params) {
     if (ponte) concluirFerramenta(ponte.id, {}, false);
   }, [concluirFerramenta]);
 
-  return { timeline, escrevendoDesde, widgetAtivo, ponteAtiva, enviar, abrirFerramenta, concluirFerramenta, voltarConversar };
+  return { timeline, escrevendoDesde, widgetAtivo, ponteAtiva, enviar, abrirFerramenta, abrirCard, concluirFerramenta, voltarConversar };
 }

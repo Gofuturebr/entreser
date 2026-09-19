@@ -11,24 +11,175 @@
     "relógio biológico",
     "é só relaxar"
   ],
-  "eixos": {
+  "trilhas": {
     "entender": {
-      "nome": "Corpo",
-      "subtitulo": "clareza clínica",
-      "descricao": "O que acontece no corpo nesses dias, explicado com calma. Quem lê o seu caso é a sua equipe médica.",
-      "status": "PENDENTE DE CHANCELA"
+      "nome": "Entender",
+      "rotulo_eixo": "Corpo",
+      "subtitulo": "a biologia da espera e da implantação",
+      "intro": "Aqui a clareza é o antídoto contra a hipervigilância: no lugar de ler sintomas, entender como os hormônios prescritos e as células se comportam, de forma autônoma e silenciosa. Quem lê o seu caso continua sendo a sua equipe médica.",
+      "rotulo_base": "base clínica",
+      "status": "PENDENTE DE CHANCELA",
+      "secoes": [
+        {
+          "id": "implantacao_silenciosa",
+          "titulo": "A implantação silenciosa",
+          "explicacao": "A implantação é um evento microscópico e mecânico, sem alarme sensorial. O corpo não avisa quando as células começam a se fixar no endométrio. O silêncio físico é o padrão biológico normal, não um sinal de que algo deu errado.",
+          "base": "Depois da transferência, guiada por ultrassom, o embrião em estágio de blastocisto é depositado na faixa ideal de espessura do endométrio, em geral entre 8 e 12 mm. As interações entre a camada precursora da placenta (trofectoderma) e o endométrio acontecem em nível molecular, sem manifestação perceptível.",
+          "temas": [
+            "implantacao",
+            "repouso",
+            "embriao_qualidade"
+          ],
+          "card_id": "implantacao-01"
+        },
+        {
+          "id": "teatro_progesterona",
+          "titulo": "O teatro da progesterona",
+          "explicacao": "Tudo o que você sente agora — inchaço, sono, seios sensíveis, cólica leve — pode ser efeito direto da medicação que protege o ambiente uterino. Isso torna os sintomas narradores pouco confiáveis: eles imitam gestação e menstruação ao mesmo tempo.",
+          "base": "O suporte de fase lútea com progesterona (micronizada vaginal ou didrogesterona oral) induz a decidualização do endométrio e mantém a receptividade. Os efeitos sistêmicos dessa carga hormonal reproduzem os sinais do início de uma gestação, tenha o embrião se fixado ou não.",
+          "temas": [
+            "progesterona",
+            "corrimento",
+            "temperatura"
+          ],
+          "card_id": "progesterona-01"
+        },
+        {
+          "id": "armadilha_testes",
+          "titulo": "A armadilha dos testes caseiros",
+          "explicacao": "O teste de farmácia antes da hora pode mentir para os dois lados: um negativo cedo demais, quando o hormônio ainda não é detectável, ou um positivo que só capta resquício da injeção de disparo. Quem responde é o exame de sangue, na data combinada com a sua equipe.",
+          "base": "O hCG só aparece em níveis detectáveis no sangue ou na urina alguns dias depois da fixação do embrião no endométrio. Testes precoces ignoram essa janela cronológica e expõem você a oscilações baseadas em reações químicas incompletas.",
+          "temas": [
+            "teste_farmacia",
+            "beta",
+            "quantos_dias"
+          ],
+          "card_id": "teste-farmacia-01"
+        },
+        {
+          "id": "utero_nao_le_pensamentos",
+          "titulo": "O útero não lê pensamentos",
+          "explicacao": "A frase \"precisa relaxar, senão não gruda\" carrega uma culpa sem base. A ansiedade e o estresse da espera são inevitáveis e não têm o poder de tirar um embrião do lugar. O seu útero é um cofre, não um sensor do seu humor.",
+          "base": "A relação entre estresse e fertilidade é complexa, e a ansiedade situacional do tratamento é uma consequência esperada. Não há evidência de que picos de cortisol na fase lútea suprimam a implantação já sustentada pela progesterona (Boivin, 2011).",
+          "temas": [
+            "estresse"
+          ],
+          "card_id": "ansiedade-01"
+        },
+        {
+          "id": "duvidas_do_dia",
+          "titulo": "Dúvidas do dia a dia",
+          "explicacao": "Perguntas pequenas que aparecem no meio da espera. Para cada uma, o que dá para saber em geral — e o lembrete de que o seu caso é da sua equipe médica.",
+          "base": "Orientações sobre repouso, intimidade, alimentação e medicação variam por clínica e protocolo. Nenhuma delas prevê resultado.",
+          "temas": [
+            "sangramento",
+            "medicacao",
+            "relacao_sexual",
+            "alimentacao"
+          ]
+        }
+      ]
     },
     "bem_estar": {
-      "nome": "Coração",
-      "subtitulo": "bem-estar emocional",
-      "descricao": "O que você está sentindo tem lugar aqui. Toca no que estiver mais perto de você.",
-      "status": "PENDENTE DE CHANCELA"
+      "nome": "Bem-estar",
+      "rotulo_eixo": "Coração",
+      "subtitulo": "clareza começa no acolhimento",
+      "intro": "O que você está sentindo tem lugar aqui. Nenhum destes conteúdos pede que você fique calma ou positiva — eles nomeiam o que a espera desperta e devolvem chão.",
+      "rotulo_base": "o que este conteúdo aborda",
+      "status": "PENDENTE DE CHANCELA",
+      "secoes": [
+        {
+          "id": "corpo_que_mente",
+          "titulo": "O corpo que mente",
+          "explicacao": "É quase impossível não monitorar o próprio corpo: cada cólica vira sinal, cada pontada vira prova. Saber que o suporte hormonal cria sintomas idênticos aos de gestação e de menstruação não desliga a ansiedade, mas tira o peso exaustivo de decifrar o corpo a cada minuto.",
+          "base": "Fisiologia da espera: por que o repouso absoluto ou a observação extrema não alteram o desfecho. O efeito do suporte hormonal e os falsos sinais físicos. Acolhimento da ambivalência: querer acreditar no sintoma e, ao mesmo tempo, se preparar para o pior.",
+          "temas": [
+            "esperanca_e_medo",
+            "progesterona"
+          ],
+          "card_id": "progesterona-01"
+        },
+        {
+          "id": "fim_positividade_toxica",
+          "titulo": "O fim da positividade tóxica",
+          "explicacao": "Existe um mito cruel nesta fase: se você não estiver relaxada e positiva, não vai dar certo. Vamos desmontar isso juntas — a sua ansiedade não decide o resultado. Sentir medo, chorar ou não estar zen não significa que você prejudicou o tratamento.",
+          "base": "Desconstrução da culpa: nervosismo e ansiedade antecipatória não anulam o preparo do endométrio. A ilusão de controle: grande parte do que acontece tem origem médica ou genética, fora do alcance dos pensamentos. Fronteiras seguras: o direito de viver as próprias emoções sem performar felicidade para os outros.",
+          "temas": [
+            "culpa",
+            "medo_do_resultado",
+            "estresse"
+          ],
+          "card_id": "ansiedade-01"
+        },
+        {
+          "id": "armadilha_antecipacao",
+          "titulo": "A armadilha da antecipação",
+          "explicacao": "A vontade de testar antes da hora ou de varar a madrugada pesquisando nasce de um lugar legítimo: recuperar algum controle. Mas o alívio da busca dura poucos minutos, e o teste precoce pode quebrar o seu coração por engano. Colocar limites na informação é um instinto de proteção.",
+          "base": "O risco do falso resultado com as medicações do ciclo. O manejo da hipervigilância de madrugada. Os acordos do casal sobre o dia certo de testar e sobre quem vê o resultado primeiro.",
+          "temas": [
+            "google",
+            "teste_farmacia"
+          ],
+          "ferramenta": "sos_google",
+          "card_id": "teste-farmacia-01"
+        },
+        {
+          "id": "preservando_a_vida",
+          "titulo": "Preservando a vida",
+          "explicacao": "Durante a espera, parece que a vida inteira fica suspensa e o presente vira só a sala de espera do resultado. Retomar os seus espaços não apaga o seu projeto nem soa como falta de compromisso. O tratamento precisa caber na sua rotina, e não a rotina sumir dentro dele.",
+          "base": "O perigo do congelamento: pausar tudo agrava a solidão. Raízes no presente: hobbies, movimento leve, conversas sem relação com fertilidade. A vida coexiste: esperança e rotina cabem ao mesmo tempo.",
+          "temas": [
+            "cansaco",
+            "solidao"
+          ],
+          "ferramenta": "plano_espera"
+        }
+      ]
     },
     "preparar": {
-      "nome": "Ações",
-      "subtitulo": "preparar",
-      "descricao": "Caminhos curtos para o dia ter forma.",
-      "status": "PENDENTE DE CHANCELA"
+      "nome": "Cuidar",
+      "rotulo_eixo": "Ações",
+      "subtitulo": "ferramentas de contenção",
+      "intro": "Caminhos curtos e concretos para os momentos em que a espera aperta. Nada aqui é obrigação: \"agora não\" é resposta completa.",
+      "rotulo_base": "como funciona",
+      "status": "PENDENTE DE CHANCELA",
+      "secoes": [
+        {
+          "id": "sos",
+          "titulo": "SOS Não Dê um Google",
+          "explicacao": "Interrupção imediata de buscas nocivas. Para o momento em que a mão vai para o celular procurar \"sintomas no dia 5 pós-transferência\".",
+          "base": "Um caminho de quatro passos: respirar, nomear o que você ia procurar, lembrar por que os sintomas mentem e escolher uma coisa pequena para os próximos minutos.",
+          "ferramenta": "sos_google"
+        },
+        {
+          "id": "plano",
+          "titulo": "Meu Plano da Espera",
+          "explicacao": "Um roteiro para o dia ter forma: pequenas entregas, cafés, leituras leves, coisas que não exigem repouso — para a rotina não entrar em suspensão.",
+          "base": "Você escolhe até três âncoras para hoje. Se uma não acontecer, não tem problema: o plano acompanha, não cobra.",
+          "ferramenta": "plano_espera"
+        },
+        {
+          "id": "acordos",
+          "titulo": "Acordos para o dia do teste",
+          "explicacao": "Combinar antes, com quem está com você, como vai ser o dia do exame: quem vê o resultado primeiro, para quem contar, o que fazer depois.",
+          "base": "Três perguntas, uma por vez. Cada uma aceita \"ainda não sei\".",
+          "ferramenta": "acordos_casal"
+        },
+        {
+          "id": "acompanhamento",
+          "titulo": "Acompanhamento Serena D1–D10",
+          "explicacao": "Todo dia, uma mensagem que valida a textura da espera daquele dia, sem prometer desfecho. Sem anotar sintomas: só como foi atravessar.",
+          "base": "A mensagem do dia chega quando você abre a conversa. A travessia completa mostra onde você está, sem contagem regressiva.",
+          "acao": "travessia"
+        },
+        {
+          "id": "pessoa",
+          "titulo": "Falar com uma pessoa",
+          "explicacao": "Existe gente de verdade do outro lado. Quando a conversa comigo não for suficiente, a ponte está aqui.",
+          "base": "Equipe Entre Ser e CVV 188, 24h.",
+          "ferramenta": "ponte_humana"
+        }
+      ]
     }
   },
   "roteiros_diarios": [
@@ -723,8 +874,10 @@
     "fechar": "fechar",
     "chip_pessoa": "Falar com uma pessoa",
     "cabecalho_dia": "dia {dia}",
-    "eixos_rotulo": "conversar sobre",
-    "eixo_tocar": "toca num tema e eu te conto"
+    "trilha_temas": "conversar com a Serena sobre",
+    "trilha_abrir": "abrir",
+    "trilha_ver_card": "ver o card",
+    "trilha_ver_travessia": "ver a travessia"
   },
   "onboarding": {
     "saudacao": "Oi. Eu sou a Serena.",

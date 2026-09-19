@@ -89,14 +89,33 @@ export type Onboarding = {
   entrar: string;
 };
 
-export type EixoConteudo = { nome: string; subtitulo: string; descricao: string; status: string };
+export type SecaoTrilha = {
+  id: string;
+  titulo: string;
+  explicacao: string;
+  base: string;
+  temas?: string[];
+  card_id?: string;
+  ferramenta?: string;
+  acao?: 'travessia';
+};
+
+export type Trilha = {
+  nome: string;
+  rotulo_eixo: string;
+  subtitulo: string;
+  intro: string;
+  rotulo_base: string;
+  status: string;
+  secoes: SecaoTrilha[];
+};
 
 export type Corpus = {
   versao: string;
   fase: string;
   aviso: string;
   vocabulario_proibido: string[];
-  eixos: Record<Eixo, EixoConteudo>;
+  trilhas: Record<Eixo, Trilha>;
   roteiros_diarios: Roteiro[];
   faq: Faq[];
   acolhimento: Acolhimento[];

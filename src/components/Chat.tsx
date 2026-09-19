@@ -4,11 +4,10 @@ import { corpusNaoChancelado, roteiroDoDia } from '../lib/corpus';
 import { entradaRegistry } from '../lib/toolRegistry';
 import { useSerena } from '../lib/useSerena';
 import { baixarJson, contarIncidentes, exportarAnonimizado } from '../lib/auditoria';
-import type { Corpus, Perfil, Preferencias } from '../lib/types';
+import type { Corpus, Eixo, Perfil, Preferencias } from '../lib/types';
 import { Bolha } from './Bolha';
 import { Cabecalho } from './Cabecalho';
-import { ChipsFerramenta } from './ChipsFerramenta';
-import { FaixaEixos, FolhaEixo, type EixoConteudoAberto } from './EixosConteudo';
+import { ChipsTrilhas, TelaTrilha } from './Trilhas';
 import { Entrada } from './Entrada';
 import { Escrevendo } from './Escrevendo';
 import { EstadoErro } from './EstadoErro';
@@ -29,12 +28,13 @@ type Props = {
   aoRecomecar: () => void;
 };
 
-type FolhaAberta = 'travessia' | 'menu' | EixoConteudoAberto | null;
+type FolhaAberta = 'travessia' | 'menu' | null;
 
 export function Chat({ corpus, cliente, base, perfil, dia, preferencias, aoMudarDia, aoMudarPreferencias, aoRecomecar }: Props) {
   const nome = perfil.nome;
   const serena = useSerena({ corpus, cliente, dia, nome });
   const [folha, setFolha] = useState<FolhaAberta>(null);
+  const [trilha, setTrilha] = useState<Eixo | null>(null);
   const fim = useRef<HTMLDivElement>(null);
   const roteiro = roteiroDoDia(corpus, dia);
   const mc = corpus.microcopy;
@@ -100,8 +100,7 @@ export function Chat({ corpus, cliente, base, perfil, dia, preferencias, aoMudar
         </div>
       ) : (
         <div className="rodape-chat">
-          <FaixaEixos corpus={corpus} desabilitado={serena.escrevendoDesde !== null} aoAbrir={setFolha} />
-          <ChipsFerramenta corpus={corpus} dia={dia} widgetAtivo={serena.widgetAtivo} aoAbrir={serena.abrirFerramenta} />
+          <ChipsTrilhas corpus={corpus} dia={dia} aoAbrirTrilha={setTrilha} aoAbrirPessoa={() => serena.abrirFerramenta('ponte_humana')} />
           <Entrada placeholder={mc.placeholder_input ?? ''} desabilitado={serena.escrevendoDesde !== null} aoEnviar={serena.enviar} />
           <p className="disclaimer">{mc.disclaimer}</p>
         </div>
@@ -113,17 +112,30 @@ export function Chat({ corpus, cliente, base, perfil, dia, preferencias, aoMudar
         </Folha>
       )}
 
-      {(folha === 'entender' || folha === 'bem_estar') && (
-        <Folha titulo={`${corpus.eixos[folha].nome} · ${corpus.eixos[folha].subtitulo}`} aoFechar={() => setFolha(null)} rotuloFechar={mc.fechar ?? 'fechar'}>
-          <FolhaEixo
-            corpus={corpus}
-            eixo={folha}
-            aoEscolher={(pergunta) => {
-              setFolha(null);
-              serena.enviar(pergunta);
-            }}
-          />
-        </Folha>
+      {trilha !== null && (
+        <TelaTrilha
+          corpus={corpus}
+          eixo={trilha}
+          dia={dia}
+          widgetAtivo={serena.widgetAtivo}
+          aoFechar={() => setTrilha(null)}
+          aoPerguntar={(pergunta) => {
+            setTrilha(null);
+            serena.enviar(pergunta);
+          }}
+          aoAbrirFerramenta={(nome) => {
+            setTrilha(null);
+            serena.abrirFerramenta(nome);
+          }}
+          aoVerCard={(cardId) => {
+            setTrilha(null);
+            serena.abrirCard(cardId);
+          }}
+          aoVerTravessia={() => {
+            setTrilha(null);
+            setFolha('travessia');
+          }}
+        />
       )}
 
       {folha === 'menu' && (

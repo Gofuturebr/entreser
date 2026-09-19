@@ -1085,100 +1085,213 @@ p {
   color: var(--cor-texto-suave);
 }
 
-/* ---------- Estrutura de conteúdo: Corpo · Coração ---------- */
-.eixos {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--esp-2);
-  padding: var(--esp-3) var(--esp-4) 0;
-}
-
-.eixo {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 2px;
-  min-height: 52px;
-  padding: var(--esp-2) var(--esp-3);
-  border-radius: var(--raio-botao);
-  background: var(--cor-berinjela-vestigio);
+/* ---------- Trilhas: Entender · Bem-estar · Cuidar ---------- */
+.chip--trilha {
+  border-color: var(--cor-berinjela-linha);
   color: var(--cor-texto);
-  text-align: left;
 }
 
-.eixo__nome {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--fonte-titulo);
-  font-weight: var(--peso-forte);
-  font-size: 15px;
-  line-height: 1.2;
-}
-
-.eixo__ponto {
+.chip__ponto {
   width: 9px;
   height: 9px;
   border-radius: var(--raio-pilula);
+  background: var(--cor-berinjela-linha);
+  flex: 0 0 auto;
 }
 
-.eixo--entender .eixo__ponto {
+.chip--entender .chip__ponto,
+.tela-trilha--entender .chip__ponto {
   background: var(--cor-eixo-entender);
 }
 
-.eixo--bem_estar .eixo__ponto {
+.chip--bem_estar .chip__ponto,
+.tela-trilha--bem_estar .chip__ponto {
   background: var(--cor-eixo-bem-estar);
 }
 
-.eixo__sub {
-  color: var(--cor-texto-suave);
-  font-size: 13px;
-  line-height: 1.2;
-  white-space: nowrap;
+.chip--preparar .chip__ponto,
+.tela-trilha--preparar .chip__ponto {
+  background: var(--cor-eixo-preparar);
 }
 
-.folha-eixo {
+.chip--evidencia .chip__ponto {
+  background: var(--cor-creme);
+}
+
+.chip--icone {
+  width: var(--alvo-toque);
+  padding: 0;
+  justify-content: center;
+  margin-left: auto;
+}
+
+/* Tela da trilha, sobre a conversa */
+.tela-trilha {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--cor-creme);
+  overflow-y: auto;
+  padding: var(--esp-4);
+  padding-top: max(var(--esp-4), env(safe-area-inset-top));
+  padding-bottom: calc(var(--esp-6) + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
+  gap: var(--esp-4);
+  animation: surgir var(--duracao-lenta) var(--curva);
+}
+
+@media (min-width: 431px) {
+  .tela-trilha {
+    left: 50%;
+    transform: translateX(-50%);
+    width: var(--largura-max);
+  }
+}
+
+.tela-trilha__cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: var(--esp-3);
 }
 
-.folha-eixo__descricao {
+.tela-trilha__eixo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--fonte-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--cor-texto-suave);
+}
+
+.tela-trilha__titulo {
+  font-size: var(--tam-titulo);
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.tela-trilha__subtitulo {
+  color: var(--cor-texto-suave);
+  font-size: var(--tam-corpo);
+}
+
+.tela-trilha__fechar {
+  flex: 0 0 auto;
+  padding: 0 var(--esp-3);
+  color: var(--cor-verde-mar);
+  font-weight: var(--peso-semi);
+}
+
+.tela-trilha__intro {
   font-size: var(--tam-corpo-grande);
   line-height: 1.55;
 }
 
-.folha-eixo__dica {
-  font-size: var(--tam-rotulo);
-  color: var(--cor-texto-suave);
-}
-
-.folha-eixo__lista {
+.tela-trilha__secoes {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
+  gap: var(--esp-3);
+}
+
+.secao {
+  background: var(--cor-superficie);
+  border-radius: var(--raio-card);
+  padding: var(--esp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+  box-shadow: inset 4px 0 0 var(--cor-berinjela-linha);
+}
+
+.tela-trilha--entender .secao {
+  box-shadow: inset 4px 0 0 var(--cor-eixo-entender);
+}
+
+.tela-trilha--bem_estar .secao {
+  box-shadow: inset 4px 0 0 var(--cor-eixo-bem-estar);
+}
+
+.tela-trilha--preparar .secao {
+  box-shadow: inset 4px 0 0 var(--cor-eixo-preparar);
+}
+
+.secao__titulo {
+  font-size: var(--tam-titulo-pequeno);
+  line-height: 1.3;
+}
+
+.secao__explicacao {
+  font-size: var(--tam-corpo);
+  line-height: 1.55;
+}
+
+.secao__base {
+  font-size: var(--tam-rotulo);
+  color: var(--cor-texto-suave);
+}
+
+.secao__base summary {
+  cursor: pointer;
+  min-height: var(--alvo-toque);
+  display: flex;
+  align-items: center;
+  font-family: var(--fonte-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--cor-berinjela);
+}
+
+.secao__base p {
+  padding: 0 0 var(--esp-2);
+  line-height: 1.5;
+}
+
+.secao__temas {
+  display: flex;
+  flex-direction: column;
   gap: var(--esp-2);
+}
+
+.secao__rotulo {
+  font-family: var(--fonte-mono);
+  font-size: 12px;
+  color: var(--cor-texto-suave);
+}
+
+.secao__acoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+.tela-trilha__acao {
+  width: 100%;
+  min-height: 48px;
+  border-radius: var(--raio-botao);
+  background: var(--cor-verde-mar);
+  color: var(--cor-creme);
+  font-weight: var(--peso-semi);
+  padding: 0 var(--esp-4);
+}
+
+.tela-trilha__acao--suave {
+  background: transparent;
+  color: var(--cor-verde-mar);
+  border: 1.5px solid var(--cor-verde-mar-linha);
 }
 
 .tema {
   width: 100%;
   text-align: left;
-  min-height: 52px;
+  min-height: 48px;
   padding: var(--esp-2) var(--esp-4);
   border-radius: var(--raio-botao);
-  background: var(--cor-superficie);
+  background: var(--cor-creme);
   border: 1px solid var(--cor-berinjela-linha);
   font-size: var(--tam-corpo);
-  box-shadow: inset 4px 0 0 var(--cor-berinjela-linha);
-}
-
-.tema--entender {
-  box-shadow: inset 4px 0 0 var(--cor-eixo-entender);
-}
-
-.tema--bem_estar {
-  box-shadow: inset 4px 0 0 var(--cor-eixo-bem-estar);
 }
