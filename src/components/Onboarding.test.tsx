@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import corpusJson from '../../specs/fixtures/corpus_e5.exemplo.json';
 import percursoJson from '../../specs/fixtures/percurso.json';
 import { validarCorpus } from '../lib/corpus';
@@ -13,6 +13,10 @@ const corpus = validarCorpus(corpusJson);
 const percurso = validarPercurso(percursoJson);
 
 describe('entrada do app: onde você está na jornada', () => {
+  beforeEach(() => {
+    Element.prototype.scrollIntoView = () => undefined;
+  });
+
   it('só a etapa 5 está ativa no mapa', () => {
     expect(percurso.fases.filter((f) => f.ativa).map((f) => f.numero)).toEqual([5]);
   });

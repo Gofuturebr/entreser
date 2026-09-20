@@ -1320,6 +1320,7 @@ p {
   cursor: pointer;
 }
 
+.mapa-jornada__pedra:focus,
 .mapa-jornada__pedra:focus-visible {
   outline: none;
 }
@@ -1382,7 +1383,11 @@ p {
 .onboarding__acoes--fixas {
   position: sticky;
   bottom: 0;
-  padding-top: var(--esp-3);
-  background: linear-gradient(to bottom, transparent, var(--cor-creme) 30%);
+  padding-top: var(--esp-4);
+  background: linear-gradient(to bottom, transparent, var(--cor-creme) 45%);
   margin-top: auto;
+}
+
+.momento {
+  scroll-margin-bottom: 140px;
 }

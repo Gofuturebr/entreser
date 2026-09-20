@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { FasePercurso, Percurso } from '../lib/types';
 import { faseDoPercurso } from '../lib/percurso';
 import { MapaJornada } from './MapaJornada';
@@ -16,6 +16,11 @@ export function EntradaJornada({ percurso, faseInicial = null, aoConfirmar }: Pr
   const [fase, setFase] = useState<number | null>(faseInicial);
   const mc = percurso.microcopy;
   const escolhida = fase === null ? undefined : faseDoPercurso(percurso, fase);
+  const momentoRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (fase !== null) momentoRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  }, [fase]);
 
   return (
     <main className="onboarding onboarding--jornada">
@@ -27,7 +32,7 @@ export function EntradaJornada({ percurso, faseInicial = null, aoConfirmar }: Pr
       <MapaJornada percurso={percurso} faseAtual={fase} aoEscolher={setFase} />
 
       {escolhida && (
-        <section className={`momento${escolhida.ativa ? ' momento--ativa' : ''}`} aria-live="polite" aria-label={`${mc.rotulo_etapa} ${escolhida.numero}`}>
+        <section ref={momentoRef} className={`momento${escolhida.ativa ? ' momento--ativa' : ''}`} aria-live="polite" aria-label={`${mc.rotulo_etapa} ${escolhida.numero}`}>
           <span className="momento__eyebrow">
             {mc.rotulo_etapa} {escolhida.numero} · {escolhida.lema}
           </span>
