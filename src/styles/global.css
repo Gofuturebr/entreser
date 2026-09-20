@@ -1295,3 +1295,94 @@ p {
   border: 1px solid var(--cor-berinjela-linha);
   font-size: var(--tam-corpo);
 }
+
+/* ---------- Entrada: mapa da jornada (E1–E7) ---------- */
+.onboarding--jornada {
+  justify-content: flex-start;
+  gap: var(--esp-4);
+  overflow-y: auto;
+  padding-top: max(var(--esp-5), env(safe-area-inset-top));
+}
+
+.jornada__topo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+.mapa-jornada {
+  width: 100%;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.mapa-jornada__pedra {
+  cursor: pointer;
+}
+
+.mapa-jornada__pedra:focus-visible {
+  outline: none;
+}
+
+.mapa-jornada__pedra:focus-visible ellipse {
+  stroke: var(--cor-foco);
+  stroke-width: 2;
+}
+
+.momento {
+  background: var(--cor-superficie);
+  border-radius: var(--raio-card);
+  padding: var(--esp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  box-shadow: inset 4px 0 0 var(--cor-berinjela-linha);
+  animation: surgir var(--duracao-lenta) var(--curva);
+}
+
+.momento--ativa {
+  box-shadow: inset 4px 0 0 var(--cor-verde-mar);
+}
+
+.momento__eyebrow {
+  font-family: var(--fonte-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--cor-texto-suave);
+}
+
+.momento__nome {
+  font-size: var(--tam-titulo-pequeno);
+  line-height: 1.25;
+}
+
+.momento__situacao {
+  font-size: var(--tam-corpo);
+  font-weight: var(--peso-semi);
+}
+
+.momento__texto {
+  font-size: var(--tam-corpo);
+  color: var(--cor-texto-suave);
+  line-height: 1.5;
+}
+
+.momento__status {
+  font-size: var(--tam-rotulo);
+  color: var(--cor-texto-suave);
+  font-style: italic;
+}
+
+.momento__status--ativa {
+  color: var(--cor-verde-mar);
+  font-style: normal;
+  font-weight: var(--peso-semi);
+}
+
+.onboarding__acoes--fixas {
+  position: sticky;
+  bottom: 0;
+  padding-top: var(--esp-3);
+  background: linear-gradient(to bottom, transparent, var(--cor-creme) 30%);
+  margin-top: auto;
+}

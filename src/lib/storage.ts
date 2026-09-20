@@ -32,7 +32,12 @@ function gravar(chave: string, valor: unknown): void {
 export const PREFERENCIAS_PADRAO: Preferencias = { travessia: 'marcador', fioRota: true };
 
 export const storage = {
-  lerPerfil: (): Perfil | null => ler<Perfil | null>(CHAVES.perfil, null),
+  lerPerfil: (): Perfil | null => {
+    const p = ler<(Partial<Perfil> & { diaInformado?: number }) | null>(CHAVES.perfil, null);
+    if (!p) return null;
+    // Perfis anteriores à entrada do Percurso não tinham fase: eram todos da espera.
+    return { ...p, fase: typeof p.fase === 'number' ? p.fase : 5 } as Perfil;
+  },
   salvarPerfil: (p: Perfil) => gravar(CHAVES.perfil, p),
 
   lerTimeline: (): Mensagem[] => ler<Mensagem[]>(CHAVES.timeline, []),

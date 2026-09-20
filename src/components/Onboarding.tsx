@@ -1,20 +1,22 @@
 import { useState } from 'react';
-import type { Corpus, Perfil } from '../lib/types';
+import type { Corpus, Percurso, Perfil } from '../lib/types';
 import { hojeISO } from '../lib/relogio';
 import { CaminhoPedras } from './Travessia';
+import { EntradaJornada } from './EntradaJornada';
 
-type Props = { corpus: Corpus; base: string; aoConcluir: (perfil: Perfil) => void };
+type Props = { corpus: Corpus; percurso: Percurso; base: string; faseInicial?: number | null; comecarNaJornada?: boolean; aoConcluir: (perfil: Perfil) => void };
 
-type Etapa = 'abertura' | 'nome' | 'dia' | 'disclaimer';
+type Etapa = 'abertura' | 'jornada' | 'nome' | 'dia' | 'disclaimer';
 
-export function Onboarding({ corpus, base, aoConcluir }: Props) {
+export function Onboarding({ corpus, percurso, base, faseInicial = null, comecarNaJornada = false, aoConcluir }: Props) {
   const ob = corpus.onboarding;
-  const [etapa, setEtapa] = useState<Etapa>('abertura');
+  const [etapa, setEtapa] = useState<Etapa>(comecarNaJornada ? 'jornada' : 'abertura');
+  const [fase, setFase] = useState<number>(faseInicial ?? percurso.fase_ativa);
   const [nome, setNome] = useState('');
   const [dia, setDia] = useState(1);
 
   const concluir = () => {
-    const perfil: Perfil = { diaInformado: dia, dataInformada: hojeISO() };
+    const perfil: Perfil = { fase, diaInformado: dia, dataInformada: hojeISO() };
     if (nome.trim()) perfil.nome = nome.trim();
     aoConcluir(perfil);
   };
@@ -28,11 +30,25 @@ export function Onboarding({ corpus, base, aoConcluir }: Props) {
           <p className="onboarding__texto">{ob.proposito}</p>
         </div>
         <div className="onboarding__acoes">
-          <button type="button" className="botao-principal" onClick={() => setEtapa('nome')}>
+          <button type="button" className="botao-principal" onClick={() => setEtapa('jornada')}>
             oi, Serena
           </button>
         </div>
       </main>
+    );
+  }
+
+  if (etapa === 'jornada') {
+    return (
+      <EntradaJornada
+        percurso={percurso}
+        faseInicial={faseInicial}
+        aoConfirmar={(f) => {
+          setFase(f.numero);
+          if (f.ativa) setEtapa('nome');
+          else aoConcluir({ fase: f.numero });
+        }}
+      />
     );
   }
 

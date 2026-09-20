@@ -16,7 +16,8 @@ Outros comandos: `npm run build`, `npm run preview`, `npm run test`, `npm run li
 ## Como testar (fundadoras e psicóloga)
 
 - **Percorrer os 10 dias:** `?dia=N` na URL (ex. `http://localhost:5173/?dia=6`) força o dia. Ou toque longo (0,6 s) na concha do cabeçalho → bancada de teste → escolher D1–D10.
-- **Onboarding:** aparece só na primeira visita (nome opcional + dia da espera). "Recomeçar do zero" na bancada apaga tudo do aparelho.
+- **Entrada (onde você está na jornada):** depois da abertura, o mapa do Percurso E1–E7 como caminho de pedras; a tentante se reconhece numa situação em linguagem comum. Só a etapa 5 (a espera) está ativa e segue para nome + dia; as outras mostram "esta etapa ainda está em preparo" com "quero ser avisada" (marca só localmente) e "mudar onde estou". Dados mocados em `specs/fixtures/percurso.json`. Na conversa, o mapa fica acessível pela folha da travessia ("ver a jornada inteira").
+- **Onboarding:** aparece só na primeira visita. "Recomeçar do zero" na bancada apaga tudo do aparelho.
 - **Hipóteses de design** (bancada): marcador da travessia **A · texto** vs. **B · pedras**; fio de cor por rota **com/sem**.
 - **Trilhas (chips acima do input):** **Entender · Bem-estar · Cuidar** + o atalho "Falar com uma pessoa". Cada chip abre uma tela sobre a conversa com as seções da trilha (referência: *O Percurso Entre Ser · Arquitetura V2*, fase E5): explicação no Tom Entre Ser, a base (clínica ou o que o conteúdo aborda) e os temas tocáveis, que enviam a pergunta para a Serena. Em Cuidar ficam as ferramentas (SOS Não Dê um Google · Meu Plano da Espera · Acordos do casal · Acompanhamento D1–D10 · Falar com uma pessoa), que abrem o widget direto, sem passar pelo mock. A Serena também as oferece na conversa (ex.: "não sei o que fazer hoje", "meu marido", "pesquisei no google").
 - **Cards de microlearning:** perguntas de Entender (ex.: "tô com cólica", "posso fazer o teste de farmácia?", "ansiedade atrapalha?") terminam com convite + card inline.
@@ -47,6 +48,7 @@ specs/                      # ÚNICA fonte de verdade (ver CLAUDE.md para a prec
   fixtures/
     corpus_e5.exemplo.json  # corpus E5 [PENDENTE DE CHANCELA] — servido em runtime (inclui as 3 trilhas)
     respostas_mock.json     # costuras do mock + comandos de bancada
+    percurso.json           # mapa E1–E7 da entrada (mock; só E5 ativa)
     cards/*.svg             # capas mockup dos cards (still life abstrato)
     concha.svg
 src/
@@ -54,11 +56,12 @@ src/
   components/               # Bolha, Cabecalho, ChipsFerramenta, Entrada, Escrevendo, EstadoErro,
                             # WidgetFerramenta, ResumoFerramenta, CardMicrolearning, CardPonteHumana,
                             # Travessia (2 variações + folha), Trilhas (chips + tela da trilha),
-                            # Onboarding, MenuTeste, Folha, Chat
+                            # MapaJornada + EntradaJornada (entrada E1–E7), Onboarding, MenuTeste, Folha, Chat
   lib/
     types.ts                # corpus + timeline tipada (texto | ferramenta | resumo_ferramenta | erro)
     corpus.ts               # carga/validação em runtime; templates
     relogio.ts              # dia por data, ?dia=N
+    percurso.ts             # carga/validação do mapa E1–E7
     guardrails.ts           # pré-filtro de crise + pós-filtro de vocabulário (listas vêm do corpus)
     ferramentaParser.ts     # invocação Nível 1: <<FERRAMENTA>>{...}<<FIM>>
     toolRegistry.ts         # registry: sos_google, plano_espera, acordos_casal, ponte_humana, card_micro

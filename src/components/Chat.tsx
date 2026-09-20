@@ -4,7 +4,7 @@ import { corpusNaoChancelado, roteiroDoDia } from '../lib/corpus';
 import { entradaRegistry } from '../lib/toolRegistry';
 import { useSerena } from '../lib/useSerena';
 import { baixarJson, contarIncidentes, exportarAnonimizado } from '../lib/auditoria';
-import type { Corpus, Eixo, Perfil, Preferencias } from '../lib/types';
+import type { Corpus, Eixo, Percurso, Perfil, Preferencias } from '../lib/types';
 import { Bolha } from './Bolha';
 import { Cabecalho } from './Cabecalho';
 import { ChipsTrilhas, TelaTrilha } from './Trilhas';
@@ -15,9 +15,11 @@ import { Folha } from './Folha';
 import { MenuTeste } from './MenuTeste';
 import { ResumoFerramenta } from './ResumoFerramenta';
 import { FolhaTravessia } from './Travessia';
+import { MapaJornada } from './MapaJornada';
 
 type Props = {
   corpus: Corpus;
+  percurso: Percurso;
   cliente: ClienteSerena;
   base: string;
   perfil: Perfil;
@@ -25,12 +27,13 @@ type Props = {
   preferencias: Preferencias;
   aoMudarDia: (dia: number) => void;
   aoMudarPreferencias: (p: Preferencias) => void;
+  aoMudarEtapa: () => void;
   aoRecomecar: () => void;
 };
 
-type FolhaAberta = 'travessia' | 'menu' | null;
+type FolhaAberta = 'travessia' | 'jornada' | 'menu' | null;
 
-export function Chat({ corpus, cliente, base, perfil, dia, preferencias, aoMudarDia, aoMudarPreferencias, aoRecomecar }: Props) {
+export function Chat({ corpus, percurso, cliente, base, perfil, dia, preferencias, aoMudarDia, aoMudarPreferencias, aoMudarEtapa, aoRecomecar }: Props) {
   const nome = perfil.nome;
   const serena = useSerena({ corpus, cliente, dia, nome });
   const [folha, setFolha] = useState<FolhaAberta>(null);
@@ -109,6 +112,19 @@ export function Chat({ corpus, cliente, base, perfil, dia, preferencias, aoMudar
       {folha === 'travessia' && (
         <Folha titulo="a travessia" aoFechar={() => setFolha(null)} rotuloFechar={mc.fechar ?? 'fechar'}>
           <FolhaTravessia corpus={corpus} dia={dia} />
+          <button type="button" className="botao-secundario" onClick={() => setFolha('jornada')}>
+            {percurso.microcopy.jornada_inteira}
+          </button>
+        </Folha>
+      )}
+
+      {folha === 'jornada' && (
+        <Folha titulo={percurso.microcopy.jornada_titulo ?? 'a jornada'} aoFechar={() => setFolha(null)} rotuloFechar={mc.fechar ?? 'fechar'}>
+          <MapaJornada percurso={percurso} faseAtual={perfil.fase} />
+          <p className="travessia__legenda">{percurso.microcopy.jornada_nota}</p>
+          <button type="button" className="botao-secundario" onClick={aoMudarEtapa}>
+            {percurso.microcopy.mudar}
+          </button>
         </Folha>
       )}
 

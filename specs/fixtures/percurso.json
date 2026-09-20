@@ -1,0 +1,31 @@
+{
+  "versao": "0.1-MOCK",
+  "aviso": "Mapa do Percurso Entre Ser (E1–E7) para a entrada do app. Dados mocados para teste de interface. Só E5 está ativa; as demais fases não têm corpus, prompt nem ferramentas neste protótipo (trava de escopo do CLAUDE.md).",
+  "fase_ativa": 5,
+  "fases": [
+    { "numero": 1, "nome": "O Despertar da Jornada", "lema": "eu encontro", "verbo": "Encontrar o meu caminho", "situacao": "Estou investigando, fazendo exames ou acabei de receber um diagnóstico", "momento": "O começo do mapa: exames, diagnóstico e um vocabulário novo.", "ativa": false },
+    { "numero": 2, "nome": "A Coragem de se Movimentar", "lema": "eu começo", "verbo": "Dar o primeiro passo", "situacao": "Estou decidindo o caminho, o orçamento e o protocolo", "momento": "Escolhas, orçamento e protocolo definidos com a equipe.", "ativa": false },
+    { "numero": 3, "nome": "O Olhar Voltado para Si", "lema": "eu cuido", "verbo": "Cuidar do caminho", "situacao": "Estou na estimulação: injeções, ultrassons, punção", "momento": "O pico logístico: medicação diária, monitorização e laboratório.", "ativa": false },
+    { "numero": 4, "nome": "O Preparo do Ninho", "lema": "eu recebo", "verbo": "Chegar à transferência", "situacao": "Estou preparando o endométrio para a transferência", "momento": "O preparo do endométrio e o dia da transferência.", "ativa": false },
+    { "numero": 5, "nome": "Habitar o Presente", "lema": "eu vivo", "verbo": "Viver o intervalo", "situacao": "Já transferi e estou esperando o resultado", "momento": "Os dias entre a transferência e o exame beta-hCG. A Serena acompanha este intervalo, um dia de cada vez.", "ativa": true },
+    { "numero": 6, "nome": "Honrar a sua Experiência", "lema": "eu acolho", "verbo": "Acolher a resposta", "situacao": "Recebi o resultado do exame", "momento": "O dia do beta-hCG e tudo o que vem com ele.", "ativa": false },
+    { "numero": 7, "nome": "A Soberania do seu Destino", "lema": "eu escolho", "verbo": "Escolher o próximo passo", "situacao": "Estou decidindo o próximo passo: pausar, tentar de novo ou seguir", "momento": "A consulta de revisão e a transição de cuidado.", "ativa": false }
+  ],
+  "microcopy": {
+    "titulo": "Onde você está agora?",
+    "legenda": "toca na etapa que descreve o seu momento — não existe ordem certa nem ritmo certo",
+    "rotulo_etapa": "etapa",
+    "ativa": "a Serena acompanha esta etapa",
+    "em_preparo": "esta etapa ainda está em preparo",
+    "em_preparo_texto": "Por enquanto, a Serena acompanha só o intervalo da espera, entre a transferência e o exame. As outras etapas do Percurso estão sendo escritas com o mesmo cuidado.",
+    "avisar": "quero ser avisada quando chegar",
+    "avisada": "combinado — a gente te avisa quando esta etapa estiver pronta",
+    "mudar": "mudar onde estou",
+    "seguir": "seguir para a espera",
+    "confirmar": "é aqui que eu estou",
+    "jornada_inteira": "ver a jornada inteira",
+    "jornada_titulo": "a jornada",
+    "jornada_nota": "neste protótipo, só a espera está ativa",
+    "voce_esta_aqui": "você está aqui"
+  }
+}

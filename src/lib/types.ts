@@ -180,9 +180,32 @@ export type MensagemErro = {
 export type Mensagem = MensagemTexto | MensagemFerramenta | MensagemResumo | MensagemErro;
 
 export type Perfil = {
+  /** Etapa do Percurso (E1–E7). Só a 5 está ativa neste protótipo. */
+  fase: number;
   nome?: string;
-  diaInformado: number;
-  dataInformada: string; // YYYY-MM-DD
+  diaInformado?: number;
+  dataInformada?: string; // YYYY-MM-DD
+  avisarQuandoChegar?: boolean;
+};
+
+// ---- Percurso (mapa das 7 etapas — dados mocados para a entrada) ----
+
+export type FasePercurso = {
+  numero: number;
+  nome: string;
+  lema: string;
+  verbo: string;
+  situacao: string;
+  momento: string;
+  ativa: boolean;
+};
+
+export type Percurso = {
+  versao: string;
+  aviso: string;
+  fase_ativa: number;
+  fases: FasePercurso[];
+  microcopy: Record<string, string>;
 };
 
 export type VariacaoTravessia = 'marcador' | 'pedras';

@@ -2,6 +2,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import corpusJson from '../../specs/fixtures/corpus_e5.exemplo.json';
+import percursoJson from '../../specs/fixtures/percurso.json';
+import { validarPercurso } from '../lib/percurso';
 import { validarCorpus } from '../lib/corpus';
 import { storage } from '../lib/storage';
 import { criarClienteMock } from '../mock/clienteMock';
@@ -9,6 +11,7 @@ import { contarIncidentes, lerAuditoria } from '../lib/auditoria';
 import { Chat } from './Chat';
 
 const corpus = validarCorpus(corpusJson);
+const percurso = validarPercurso(percursoJson);
 const rapido = { primeiro_token_ms: 0, intervalo_token_ms: 0, demora_ms: 0 };
 
 function montar(dia = 6) {
@@ -16,13 +19,15 @@ function montar(dia = 6) {
   return render(
     <Chat
       corpus={corpus}
+      percurso={percurso}
       cliente={cliente}
       base="/"
-      perfil={{ nome: 'Ana', diaInformado: dia, dataInformada: '2026-09-18' }}
+      perfil={{ fase: 5, nome: 'Ana', diaInformado: dia, dataInformada: '2026-09-18' }}
       dia={dia}
       preferencias={{ travessia: 'marcador', fioRota: true }}
       aoMudarDia={() => undefined}
       aoMudarPreferencias={() => undefined}
+      aoMudarEtapa={() => undefined}
       aoRecomecar={() => undefined}
     />,
   );
