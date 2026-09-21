@@ -67,7 +67,7 @@
 
 ### T4 · Card Ponte Humana (estado de crise)
 - **O componente mais importante do produto.** Máxima calma: fundo creme pleno, sem vermelho, sem ícones de alerta
-- Texto validado (vem do corpus), 2 ações grandes e claras: falar com a equipe Entre Ser + CVV 188 (ligação direta)
+- Texto validado (vem do corpus), 1 ação grande e clara: falar com a equipe Entre Ser
 - O chat fica em pausa visível e gentil ("estou aqui quando você quiser voltar") — retorno por 1 toque
 - Nada mais na tela: sem chips, sem teclado, sem distração
 

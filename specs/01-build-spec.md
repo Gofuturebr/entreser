@@ -62,7 +62,7 @@ Todo o conteúdo do agente vive em **`corpus/corpus_e5.json`**, carregado em run
   ],
   "escalonamento": {
     "mensagem_ponte_humana": "...",
-    "contatos": { "equipe": "<definir>", "cvv": "188" }
+    "contatos": { "equipe": "<definir>" }
   }
 }
 ```
@@ -103,7 +103,7 @@ Ao abrir o app no dia N (ou ao avançar o dia manualmente — ver §6), a Serena
 | 3 | Mensagem do dia | Renderizada ao abrir, 1x por dia, com selo; nunca reenviada na mesma sessão |
 | 4 | Chat livre | Streaming visível; indicador "Serena está escrevendo…"; histórico da sessão mantido no contexto (janela: últimas ~20 mensagens) |
 | 5 | Ferramentas | Renderizadas como widget inline na timeline (ver §10), passo a passo, sem LLM no interior; 3 chips fixos acima do input como porta de acesso direto da usuária; "agora não" sempre disponível |
-| 6 | Ponte Humana | Acionável por: gatilho de crise, chip "Falar com uma pessoa", ou decisão do LLM. Card de máxima calma: contato da equipe + CVV 188. Depois do card, o chat livre fica pausado até a usuária tocar "voltar a conversar" |
+| 6 | Ponte Humana | Acionável por: gatilho de crise, chip "Falar com uma pessoa", ou decisão do LLM. Card de máxima calma: contato da equipe Entre Ser. Depois do card, o chat livre fica pausado até a usuária tocar "voltar a conversar" |
 | 7 | Auditoria | Menu oculto (long-press no logo): exportar conversas da sessão como JSON **anonimizado** (sem nome) para revisão da psicóloga; contador de incidentes do pós-filtro |
 | 8 | Disclaimer | Rodapé permanente: "Protótipo de teste. A Serena não substitui acompanhamento médico ou psicológico." |
 | 9 | Modo teste de mesa | Query param `?dia=N` força o dia (para as fundadoras testarem os 10 roteiros rapidamente) |

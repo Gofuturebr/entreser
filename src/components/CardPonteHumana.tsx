@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { Escalonamento } from '../lib/types';
 
 export function CardPonteHumana({ escalonamento }: { escalonamento: Escalonamento }) {
-  const { equipe, cvv } = escalonamento.contatos;
+  const { equipe } = escalonamento.contatos;
   const [notaEquipe, setNotaEquipe] = useState(false);
 
   return (
@@ -12,6 +12,7 @@ export function CardPonteHumana({ escalonamento }: { escalonamento: Escalonament
       {equipe.url ? (
         <a className="ponte__acao ponte__acao--equipe" href={equipe.url}>
           {equipe.rotulo}
+          {equipe.descricao && <small>{equipe.descricao}</small>}
         </a>
       ) : (
         <button type="button" className="ponte__acao ponte__acao--equipe" onClick={() => setNotaEquipe(true)}>
@@ -19,11 +20,6 @@ export function CardPonteHumana({ escalonamento }: { escalonamento: Escalonament
         </button>
       )}
       {notaEquipe && equipe.nota_pendente && <p className="ponte__nota">{equipe.nota_pendente}</p>}
-
-      <a className="ponte__acao ponte__acao--cvv" href={cvv.url}>
-        {cvv.rotulo}
-        {cvv.descricao && <small>{cvv.descricao}</small>}
-      </a>
     </section>
   );
 }

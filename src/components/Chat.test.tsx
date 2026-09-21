@@ -51,7 +51,8 @@ describe('Chat (Degrau B)', () => {
     montar();
     await userEvent.type(campo(), 'quero morrer{enter}');
     expect(await screen.findByRole('region', { name: 'Ponte Humana' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /CVV/ })).toHaveAttribute('href', 'tel:188');
+    expect(screen.getByRole('button', { name: /falar com a equipe Entre Ser/ })).toBeInTheDocument();
+    expect(screen.queryByText(/cvv/i)).not.toBeInTheDocument();
     expect(screen.queryByLabelText('escreve o que quiser…')).not.toBeInTheDocument();
     expect(lerAuditoria().incidentes[0]?.tipo).toBe('crise_prefiltro');
     await userEvent.click(screen.getByRole('button', { name: 'voltar a conversar' }));

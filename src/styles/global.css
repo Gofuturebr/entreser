@@ -648,11 +648,6 @@ p {
 }
 
 .ponte__acao--equipe {
-  background: var(--cor-berinjela);
-  color: var(--cor-creme);
-}
-
-.ponte__acao--cvv {
   background: var(--cor-verde-mar);
   color: var(--cor-creme);
 }

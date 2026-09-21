@@ -176,7 +176,7 @@
           "id": "pessoa",
           "titulo": "Falar com uma pessoa",
           "explicacao": "Existe gente de verdade do outro lado. Quando a conversa comigo não for suficiente, a ponte está aqui.",
-          "base": "Equipe Entre Ser e CVV 188, 24h.",
+          "base": "Equipe Entre Ser.",
           "ferramenta": "ponte_humana"
         }
       ]
@@ -847,11 +847,6 @@
         "rotulo": "falar com a equipe Entre Ser",
         "url": "",
         "nota_pendente": "[PENDENTE] contato da equipe ainda em definição no protótipo"
-      },
-      "cvv": {
-        "rotulo": "ligar para o CVV · 188",
-        "url": "tel:188",
-        "descricao": "Centro de Valorização da Vida — 24h, gratuito"
       }
     },
     "status": "PENDENTE DE CHANCELA"
@@ -886,7 +881,7 @@
     "prefiro_nao_dizer": "prefiro não dizer",
     "pergunta_dia": "Em que dia da espera você está?",
     "legenda_dia": "conta a partir do dia seguinte à transferência",
-    "disclaimer": "Isto é um protótipo de teste. A Serena não substitui a sua equipe médica nem acompanhamento psicológico. Se você estiver em risco, o CVV atende no 188.",
+    "disclaimer": "Isto é um protótipo de teste. A Serena não substitui a sua equipe médica nem acompanhamento psicológico. Se você estiver em risco, procure a sua rede de apoio ou um serviço de emergência.",
     "entrar": "vamos juntas"
   }
 }

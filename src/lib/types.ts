@@ -72,7 +72,7 @@ export type Escalonamento = {
   termos_gatilho: string[];
   mensagem_ponte_humana: string;
   mensagem_pausa: string;
-  contatos: { equipe: Contato; cvv: Contato };
+  contatos: { equipe: Contato };
   status: string;
 };
 
