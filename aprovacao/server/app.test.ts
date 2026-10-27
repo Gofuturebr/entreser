@@ -1,7 +1,7 @@
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import AdmZip from 'adm-zip';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { criarApp, tratarErros } from './app.ts';
@@ -43,11 +43,11 @@ function zipDe(pasta: string, destino: string): string {
   return destino;
 }
 
-async function enviar(slug: string, arquivos: { zip?: string; planilha?: string }, lote?: string) {
+async function enviar(slug: string, arquivos: { zip?: string; planilhas?: string[] }, lote?: string) {
   const form = new FormData();
   if (lote) form.append('lote', lote);
   if (arquivos.zip) form.append('zip', new Blob([readFileSync(arquivos.zip)]), 'lote.zip');
-  if (arquivos.planilha) form.append('planilha', new Blob([readFileSync(arquivos.planilha)]), 'Planilha-exemplo.xlsx');
+  for (const p of arquivos.planilhas ?? []) form.append('planilhas', new Blob([readFileSync(p)]), basename(p));
   return admin(`/api/admin/projetos/${slug}/upload`, { method: 'POST', body: form });
 }
 
@@ -161,10 +161,10 @@ describe('fluxo de aprovação', () => {
     const pasta = mkdtempSync(join(dataDir, 'pl-'));
     const zip = zipDe(join(exemplo, 'planilha-exemplo/pastas'), join(pasta, 'pastas.zip'));
     const planilha = join(exemplo, 'planilha-exemplo/Planilha-exemplo.xlsx');
-    const up = (await (await enviar(slug, { zip, planilha }, 'Entender e Praticar')).json()) as ResultadoUpload;
+    const up = (await (await enviar(slug, { zip, planilhas: [planilha] }, 'Entender e Praticar')).json()) as ResultadoUpload;
     expect(up).toMatchObject({ tipo: 'lote', chave: 'entender-e-praticar', manifesto: 'planilha', conteudos: 4 });
 
-    const so = (await (await enviar(slug, { planilha }, 'entender-e-praticar')).json()) as ResultadoUpload;
+    const so = (await (await enviar(slug, { planilhas: [planilha] }, 'entender-e-praticar')).json()) as ResultadoUpload;
     expect(so).toMatchObject({ chave: 'entender-e-praticar', nome: 'Entender e Praticar', atualizados: [] });
     const d = (await (await fetch(`${base}/api/p/${slug}/l/entender-e-praticar/c/C1.1`)).json()) as DetalheConteudo;
     expect(d.conteudo.imagens).toHaveLength(4); // arquivos do envio anterior continuam
@@ -204,5 +204,29 @@ describe('fluxo de aprovação', () => {
     for (const a of aps) await admin(`/api/admin/projetos/${slug}/apontamentos/${a.id}`, { method: 'PATCH', body: JSON.stringify({ resolvido: true }) });
     const lotes = (await (await fetch(`${base}/api/p/${slug}/lotes`)).json()) as ResumoLote[];
     expect(lotes.find((l) => l.chave === 'f1')!.conteudos['C1.1']!.abertos).toBe(0);
+  });
+
+  it('lote com uma planilha por trilha: envia junto, atualiza uma e tira outra', async () => {
+    const pasta = mkdtempSync(join(dataDir, 'trilhas-'));
+    const zip = zipDe(join(exemplo, 'planilha-exemplo/pastas'), join(pasta, 'pastas.zip'));
+    const entender = join(exemplo, 'planilhas-por-trilha/Conteudos-Entender.xlsx');
+    const praticar = join(exemplo, 'planilhas-por-trilha/Conteudos-Praticar.xlsx');
+    const up = (await (await enviar(slug, { zip, planilhas: [entender, praticar] }, 'Trilhas separadas')).json()) as ResultadoUpload;
+    expect(up).toMatchObject({ chave: 'trilhas-separadas', manifesto: 'planilha', conteudos: 4, avisos: [] });
+
+    const lotes = async () => ((await (await fetch(`${base}/api/p/${slug}/lotes`)).json()) as ResumoLote[]).find((l) => l.chave === 'trilhas-separadas')!;
+    expect((await lotes()).trilhas.map((t) => t.titulo)).toEqual(['Entender', 'Praticar']);
+
+    // Reenviar só uma planilha (mesmo nome) mantém a outra.
+    expect(((await (await enviar(slug, { planilhas: [praticar] }, 'trilhas-separadas')).json()) as ResultadoUpload).conteudos).toBe(4);
+    const proj = (await (await admin(`/api/admin/projetos/${slug}`)).json()) as ProjetoAdmin;
+    expect(proj.lotes.find((l) => l.chave === 'trilhas-separadas')!.planilhas).toEqual(['Conteudos-Entender.xlsx', 'Conteudos-Praticar.xlsx']);
+
+    // Tirar uma planilha tira a trilha dela.
+    const r = await admin(`/api/admin/projetos/${slug}/lotes/trilhas-separadas/planilhas/Conteudos-Praticar.xlsx`, { method: 'DELETE' });
+    expect(((await r.json()) as ResultadoUpload).conteudos).toBe(2);
+    expect((await lotes()).trilhas.map((t) => t.titulo)).toEqual(['Entender']);
+    const ultima = await admin(`/api/admin/projetos/${slug}/lotes/trilhas-separadas/planilhas/Conteudos-Entender.xlsx`, { method: 'DELETE' });
+    expect(ultima.status).toBe(400);
   });
 });

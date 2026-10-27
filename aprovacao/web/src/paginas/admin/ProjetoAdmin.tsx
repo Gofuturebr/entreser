@@ -91,7 +91,7 @@ function LinkRevisoras({ slug }: { slug: string }) {
 function Envio({ projeto, aoEnviar }: { projeto: Projeto; aoEnviar: () => void }) {
   const [lote, setLote] = useState('');
   const [nomeNovo, setNomeNovo] = useState('');
-  const [planilha, setPlanilha] = useState<File | null>(null);
+  const [planilhas, setPlanilhas] = useState<File[]>([]);
   const [zip, setZip] = useState<File | null>(null);
   const [progresso, setProgresso] = useState<number | null>(null);
   const [resultado, setResultado] = useState<ResultadoUpload | null>(null);
@@ -103,14 +103,14 @@ function Envio({ projeto, aoEnviar }: { projeto: Projeto; aoEnviar: () => void }
     const form = new FormData();
     const alvo = lote || nomeNovo.trim();
     if (alvo) form.append('lote', alvo);
-    if (planilha) form.append('planilha', planilha);
+    for (const p of planilhas) form.append('planilhas', p);
     if (zip) form.append('zip', zip);
     setErro('');
     setResultado(null);
     setProgresso(0);
     try {
       setResultado(await admin.enviar(projeto.slug, form, setProgresso));
-      setPlanilha(null);
+      setPlanilhas([]);
       setZip(null);
       setChaveForm((k) => k + 1);
       aoEnviar();
@@ -136,26 +136,34 @@ function Envio({ projeto, aoEnviar }: { projeto: Projeto; aoEnviar: () => void }
           <input aria-label="Nome do novo lote" placeholder="Nome do lote (ex.: Entender · F1)" value={nomeNovo} onChange={(e) => setNomeNovo(e.target.value)} />
         )}
 
-        <label htmlFor="planilha">Planilha de Conteúdo (.xlsx)</label>
+        <label htmlFor="planilhas">Planilhas de Conteúdo (.xlsx)</label>
+        <small className="suave">Uma ou várias: por exemplo, uma planilha por trilha (Entender, Bem-estar…).</small>
         <input
-          id="planilha"
+          id="planilhas"
           type="file"
           accept=".xlsx"
+          multiple
           onChange={(e) => {
-            const f = e.target.files?.[0] ?? null;
-            setPlanilha(f);
-            if (f && !lote && !nomeNovo) setNomeNovo(f.name.replace(/\.xlsx$/i, ''));
+            const fs = [...(e.target.files ?? [])];
+            setPlanilhas(fs);
+            const primeira = fs[0];
+            if (primeira && !lote && !nomeNovo) setNomeNovo(fs.length === 1 ? primeira.name.replace(/\.xlsx$/i, '') : projeto.nome);
           }}
         />
+        {planilhas.length > 1 && (
+          <ul className="pequeno lista-arquivos">
+            {planilhas.map((p) => <li key={p.name}>{p.name}</li>)}
+          </ul>
+        )}
         <label htmlFor="zip">Pastas de conteúdo (.zip)</label>
         <input id="zip" type="file" accept=".zip" onChange={(e) => setZip(e.target.files?.[0] ?? null)} />
 
         <details className="ajuda">
           <summary>O que posso enviar?</summary>
           <ul>
-            <li><strong>Planilha + ZIP com as pastas</strong>: a planilha diz o que mostrar (Eixo → trilha, Trilha → tema) e cada linha encontra a pasta que começa com o ID (ex.: <code>C7.2-…</code>).</li>
+            <li><strong>Planilhas + ZIP com as pastas</strong>: as planilhas dizem o que mostrar (Eixo → trilha, Trilha → tema) e cada linha encontra a pasta que começa com o ID (ex.: <code>C7.2-…</code>). Várias planilhas (uma por trilha) se somam no mesmo lote; um ZIP só pode trazer as pastas de todas.</li>
             <li><strong>ZIP do lote com <code>trilhas.json</code></strong>: lido pelo manifesto JSON; o nome vem do próprio lote.</li>
-            <li><strong>Só a planilha ou só o ZIP</strong>, num lote existente: troca essa parte e mantém a outra.</li>
+            <li><strong>Só planilhas ou só o ZIP</strong>, num lote existente: troca essa parte e mantém a outra. Uma planilha com o mesmo nome de arquivo substitui a anterior; com nome novo, entra como mais uma.</li>
             <li><strong>ZIP de um conteúdo</strong> (<code>conteudo.json</code> na raiz): substitui só esse conteúdo.</li>
           </ul>
           <p>Apontamentos e aprovações não se perdem: ficam presos ao ID do conteúdo. Se o conteúdo mudar, as aprovações antigas aparecem como “versão anterior”.</p>
@@ -168,7 +176,7 @@ function Envio({ projeto, aoEnviar }: { projeto: Projeto; aoEnviar: () => void }
           </div>
         )}
         {erro && <p className="erro">{erro}</p>}
-        <button className="botao" type="submit" disabled={(!planilha && !zip) || progresso !== null}>Enviar</button>
+        <button className="botao" type="submit" disabled={(planilhas.length === 0 && !zip) || progresso !== null}>Enviar</button>
       </form>
       {resultado && <Resultado r={resultado} />}
     </section>
@@ -194,12 +202,23 @@ function Resultado({ r }: { r: ResultadoUpload }) {
 }
 
 function Lotes({ projeto, aoMudar }: { projeto: Projeto; aoMudar: () => void }) {
-  if (projeto.lotes.length === 0) return null;
+  const [erro, setErro] = useState('');
   async function remover(chave: string, nome: string) {
     if (!window.confirm(`Tirar o lote "${nome}" do projeto? Os apontamentos ficam guardados e voltam se o lote for enviado de novo.`)) return;
     await admin.removerLote(projeto.slug, chave);
     aoMudar();
   }
+  async function removerPlanilha(chave: string, planilha: string) {
+    if (!window.confirm(`Tirar a planilha "${planilha}" deste lote? As trilhas que só ela trazia saem da tela das revisoras; os apontamentos ficam guardados.`)) return;
+    setErro('');
+    try {
+      await admin.removerPlanilha(projeto.slug, chave, planilha);
+      aoMudar();
+    } catch (e) {
+      setErro(mensagem(e));
+    }
+  }
+  if (projeto.lotes.length === 0) return null;
   return (
     <section className="secao">
       <h2>Lotes</h2>
@@ -208,12 +227,28 @@ function Lotes({ projeto, aoMudar }: { projeto: Projeto; aoMudar: () => void }) 
           <li key={l.chave}>
             <span>
               <strong>{l.nome}</strong>
-              <small>manifesto {l.manifesto === 'planilha' ? 'planilha' : 'JSON'} · enviado {dataCurta(l.enviadoEm)}</small>
+              <small>
+                {l.manifesto === 'planilha' ? `${l.planilhas.length} ${l.planilhas.length === 1 ? 'planilha' : 'planilhas'}` : 'manifesto JSON'} · enviado{' '}
+                {dataCurta(l.enviadoEm)}
+              </small>
+              {l.planilhas.length > 1 && (
+                <ul className="lista-arquivos pequeno">
+                  {l.planilhas.map((p) => (
+                    <li key={p}>
+                      {p}{' '}
+                      <button type="button" className="link perigo" onClick={() => removerPlanilha(l.chave, p)}>
+                        tirar
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </span>
             <button type="button" className="link perigo" onClick={() => remover(l.chave, l.nome)}>remover</button>
           </li>
         ))}
       </ul>
+      {erro && <p className="erro">{erro}</p>}
     </section>
   );
 }

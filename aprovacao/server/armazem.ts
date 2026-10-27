@@ -4,10 +4,10 @@ import { createHash } from 'node:crypto';
 import {
   copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync,
 } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import type { Banco, ProjetoLinha } from './db.ts';
 import { ITEM_TEXTO, itemImagem, itemPeca } from './itens.ts';
-import { ARQUIVO_PLANILHA, lerLote, slug } from './lote.ts';
+import { ARQUIVO_PLANILHA, PASTA_PLANILHAS, lerLote, planilhasDoLote, slug } from './lote.ts';
 import type { Conteudo, Lote, ResultadoUpload } from './tipos.ts';
 import { extrairZip } from './zip.ts';
 
@@ -15,7 +15,8 @@ export type Upload = {
   projeto: ProjetoLinha;
   /** Nome digitado no admin ou chave de um lote existente. */
   lote?: string | undefined;
-  planilha?: { caminho: string; nome: string } | undefined;
+  /** Uma planilha por trilha, se for o caso. Mesmo nome de arquivo = substitui aquela planilha. */
+  planilhas?: { caminho: string; nome: string }[] | undefined;
   zip?: string | undefined;
 };
 
@@ -88,7 +89,7 @@ export function criarArmazem(dataDir: string, banco: Banco) {
       else mkdirSync(novo, { recursive: true });
 
       if (existsSync(join(novo, 'trilhas.json'))) return await instalarLoteJson(u, novo);
-      if (existsSync(join(novo, 'conteudo.json')) && !u.planilha) return await instalarConteudoIsolado(u, novo);
+      if (existsSync(join(novo, 'conteudo.json')) && !u.planilhas?.length) return await instalarConteudoIsolado(u, novo);
       return await instalarLotePlanilha(u, novo);
     } finally {
       rmSync(tmp, { recursive: true, force: true });
@@ -118,33 +119,87 @@ export function criarArmazem(dataDir: string, banco: Banco) {
     const trilhas = JSON.parse(readFileSync(join(novo, 'trilhas.json'), 'utf8')) as { lote?: { nome?: string; fase?: string } };
     const chave = slug(u.lote || trilhas.lote?.fase || 'lote') || 'lote';
     const nome = trilhas.lote?.nome || u.lote || chave;
-    const avisos = u.planilha ? ['A planilha foi ignorada: o ZIP já traz o manifesto trilhas.json.'] : [];
+    const avisos = u.planilhas?.length ? ['As planilhas foram ignoradas: o ZIP já traz o manifesto trilhas.json.'] : [];
     return concluir(u, novo, chave, nome, avisos);
+  }
+
+  /** Nome com que a planilha fica guardada: é ele que diz qual planilha um novo envio substitui. */
+  const nomePlanilha = (n: string) => {
+    const base = basename(n.replace(/\\/g, '/')).replace(/[<>:"/\\|?*]/g, '').replace(/^[._~$]+/, '').trim() || 'planilha';
+    return /\.xlsx$/i.test(base) ? base : `${base}.xlsx`;
+  };
+
+  /** Nomes das planilhas de um lote (lotes antigos, de planilha única, aparecem com o nome do lote). */
+  function planilhas(slugProjeto: string, chave: string, nomeLote: string): string[] {
+    return planilhasDoLote(dirLote(slugProjeto, chave)).map((r) => (r === ARQUIVO_PLANILHA ? nomePlanilha(nomeLote) : basename(r)));
   }
 
   async function instalarLotePlanilha(u: Upload, novo: string): Promise<ResultadoUpload> {
     const xlsxNoZip = readdirSync(novo).filter((n) => /\.xlsx$/i.test(n) && !n.startsWith('~$') && n !== ARQUIVO_PLANILHA);
+    const enviadas = [
+      ...(u.planilhas ?? []).map((p) => ({ caminho: p.caminho, nome: nomePlanilha(p.nome) })),
+      ...xlsxNoZip.map((n) => ({ caminho: join(novo, n), nome: nomePlanilha(n) })),
+    ];
     const lotes = banco.lotes(u.projeto.id);
-    const nomeBase = (u.lote || (u.planilha ? u.planilha.nome : xlsxNoZip[0]))?.replace(/\.xlsx$/i, '').trim();
+    const nomeBase = (u.lote || enviadas[0]?.nome)?.replace(/\.xlsx$/i, '').trim();
     if (!nomeBase)
-      throw new Error('Escolha o lote que este ZIP atualiza, ou envie a planilha junto: sem ela não sei quais conteúdos mostrar.');
+      throw new Error('Escolha o lote que este ZIP atualiza, ou envie as planilhas junto: sem elas não sei quais conteúdos mostrar.');
     const anterior = lotes.find((l) => l.chave === nomeBase || l.nome === nomeBase || l.chave === slug(nomeBase));
     const chave = anterior?.chave ?? (slug(nomeBase) || 'lote');
     const dirAnterior = dirLote(u.projeto.slug, chave);
 
-    // Sem ZIP, os arquivos do lote anterior continuam (troca-se só a planilha).
+    // Sem ZIP, os arquivos do lote anterior continuam (troca-se só planilha).
     if (!u.zip && anterior && existsSync(dirAnterior)) cpSync(dirAnterior, novo, { recursive: true });
 
-    const destinoPlanilha = join(novo, ARQUIVO_PLANILHA);
-    const primeiraNoZip = xlsxNoZip[0];
-    if (u.planilha) copyFileSync(u.planilha.caminho, destinoPlanilha);
-    else if (primeiraNoZip) renameSync(join(novo, primeiraNoZip), destinoPlanilha);
-    else if (!existsSync(destinoPlanilha) && existsSync(join(dirAnterior, ARQUIVO_PLANILHA)))
-      copyFileSync(join(dirAnterior, ARQUIVO_PLANILHA), destinoPlanilha);
-    if (!existsSync(destinoPlanilha))
-      throw new Error('Falta a planilha: envie o .xlsx junto (no campo da planilha ou dentro do ZIP).');
+    // As planilhas do lote anterior continuam; uma enviada com o mesmo nome substitui a antiga.
+    const pasta = join(novo, PASTA_PLANILHAS);
+    mkdirSync(pasta, { recursive: true });
+    if (anterior && existsSync(dirAnterior))
+      for (const [i, nome] of planilhas(u.projeto.slug, chave, anterior.nome).entries()) {
+        const origem = join(dirAnterior, planilhasDoLote(dirAnterior)[i] ?? '');
+        if (!existsSync(join(pasta, nome))) copyFileSync(origem, join(pasta, nome));
+      }
+    rmSync(join(novo, ARQUIVO_PLANILHA), { force: true });
+    for (const e of enviadas) copyFileSync(e.caminho, join(pasta, e.nome));
+    for (const n of xlsxNoZip) rmSync(join(novo, n), { force: true });
+    if (planilhasDoLote(novo).length === 0)
+      throw new Error('Falta a planilha: envie o .xlsx junto (no campo das planilhas ou dentro do ZIP).');
 
     return concluir(u, novo, chave, anterior?.nome ?? nomeBase, []);
+  }
+
+  /** Tira uma planilha (e as trilhas que só ela trazia) de um lote com mais de uma. */
+  async function removerPlanilha(projeto: ProjetoLinha, chave: string, nome: string): Promise<ResultadoUpload> {
+    const info = banco.lotes(projeto.id).find((l) => l.chave === chave);
+    if (!info) throw new Error('Lote não encontrado.');
+    const dir = dirLote(projeto.slug, chave);
+    const nomes = planilhas(projeto.slug, chave, info.nome);
+    const i = nomes.indexOf(nome);
+    const relativo = planilhasDoLote(dir)[i];
+    if (i < 0 || !relativo) throw new Error('Esta planilha não está mais no lote; recarregue a página.');
+    if (nomes.length === 1) throw new Error('É a única planilha deste lote. Para tirar o lote inteiro, use "remover" no lote.');
+
+    const guardada = join(raizTmp, `planilha-${Date.now()}.xlsx`);
+    renameSync(join(dir, relativo), guardada);
+    let l: Lote;
+    try {
+      l = await lerLote(dir, chave);
+    } catch (e) {
+      renameSync(guardada, join(dir, relativo));
+      throw e;
+    }
+    rmSync(guardada, { force: true });
+    cache.delete(`${projeto.slug}/${chave}`);
+    banco.tocarLote(projeto.id, chave);
+    return {
+      tipo: 'lote',
+      chave,
+      nome: info.nome,
+      manifesto: l.manifesto,
+      conteudos: Object.keys(l.conteudos).length,
+      atualizados: registrarVersoes(projeto.id, l, dir, true),
+      avisos: l.avisos,
+    };
   }
 
   async function instalarConteudoIsolado(u: Upload, novo: string): Promise<ResultadoUpload> {
@@ -187,6 +242,8 @@ export function criarArmazem(dataDir: string, banco: Banco) {
     dirLote,
     lote,
     instalar,
+    planilhas,
+    removerPlanilha,
     removerProjeto(slugProjeto: string) {
       for (const k of cache.keys()) if (k.startsWith(`${slugProjeto}/`)) cache.delete(k);
       rmSync(dirProjeto(slugProjeto), { recursive: true, force: true });

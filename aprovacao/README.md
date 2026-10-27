@@ -38,12 +38,12 @@ Tudo o que o app guarda fica em `data/`: o banco `aprovacao.db` e os lotes envia
 
    | Envio | O que acontece |
    |---|---|
-   | Planilha (.xlsx) + ZIP com as pastas | A planilha é o manifesto: **Eixo → trilha**, **Trilha → tema**, ordem das linhas. Cada linha acha a pasta cujo nome começa com o ID (`C7.2-…` ou `C7.2`), em qualquer nível do ZIP. Linha sem pasta aparece só com os textos da planilha. |
+   | Planilhas (.xlsx) + ZIP com as pastas | As planilhas são o manifesto: **Eixo → trilha**, **Trilha → tema**, ordem das linhas. Cada linha acha a pasta cujo nome começa com o ID (`C7.2-…` ou `C7.2`), em qualquer nível do ZIP. Linha sem pasta aparece só com os textos da planilha. **Várias planilhas** (por exemplo, uma por trilha: Entender, Bem-estar…) se somam no mesmo lote, com um ZIP só trazendo as pastas de todas. |
    | ZIP do lote com `trilhas.json` | Lido pelo manifesto JSON da skill de lote (`trilhas.json` → `temas.json` → `conteudo.json`). |
-   | Só a planilha, ou só o ZIP, num lote existente | Troca essa parte e mantém a outra. |
+   | Só planilhas, ou só o ZIP, num lote existente | Troca essa parte e mantém a outra. Uma planilha com o **mesmo nome de arquivo** substitui a anterior; com nome novo, entra como mais uma trilha. No admin, cada planilha do lote tem um "tirar". |
    | ZIP de um conteúdo (`conteudo.json` na raiz) | Substitui só aquele conteúdo. |
 
-   Se a planilha tiver uma aba `Trilhas` com `ID | Título`, os temas aparecem pelo nome (senão, pelo ID, ex.: "T7").
+   Se a planilha tiver uma aba `Trilhas` com `ID | Título`, os temas aparecem pelo nome (senão, pelo ID, ex.: "T7"). As trilhas aparecem na ordem dos nomes das planilhas; um ID repetido em duas planilhas vira aviso, e vale o da primeira.
 4. **Mande o link** para as revisoras.
 5. **Acompanhe** em "Andamento" e "Apontamentos". Marque como resolvido o que já foi ajustado e **exporte** em Markdown (para colar numa sessão de ajuste) ou CSV (para planilha).
 
@@ -78,7 +78,7 @@ npm run dev         # servidor + Vite com recarga (http://localhost:3000)
 npm run test        # testes do servidor (manifestos, ZIP, API)
 npm run typecheck
 npm run lint
-npm run exemplo     # gera exemplo/lote-exemplo.zip e exemplo/planilha-exemplo.zip para testar o upload
+npm run exemplo     # gera os ZIPs de exemplo (lote JSON, planilha única, uma planilha por trilha) para testar o upload
 ```
 
 - `server/`: Express + `node:sqlite`, roda TypeScript direto no Node (sem build).

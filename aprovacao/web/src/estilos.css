@@ -234,3 +234,6 @@ input[type='file'] { width: 100%; padding: 0.5rem 0; }
 .botao-aprovado.ativo { background: var(--aprovado); color: #fff; opacity: 1; cursor: default; }
 .secao.aprovada, .imagem.aprovada img { border-color: var(--aprovado); box-shadow: 0 0 0 1px var(--aprovado); }
 .acoes-peca { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.lista-arquivos { list-style: none; padding: 0; margin: 0.25rem 0 0; display: grid; gap: 0.1rem; color: var(--suave); }
+.lista-arquivos li { display: flex; align-items: center; gap: 0.25rem; padding: 0; border: 0; }
+.lista-simples .lista-arquivos li { border: 0; padding: 0; justify-content: flex-start; }

@@ -23,6 +23,7 @@ type Opcoes = { banco: Banco; armazem: Armazem; senhaAdmin: string; dataDir: str
 
 const ALVOS: Alvo[] = ['texto', 'formato', 'imagem'];
 const LIMITE_TEXTO = 5000;
+const MAX_PLANILHAS = 30;
 
 function resumir(id: string, decisoes: DecisaoLinha[], apontamentos: Apontamento[], versao: VersaoLinha | null): ResumoConteudo {
   const atualizadoEm = versao?.atualizadoEm ?? null;
@@ -257,7 +258,10 @@ export function criarApp({ banco, armazem, senhaAdmin, dataDir }: Opcoes) {
     next();
   });
 
-  const projetoAdmin = (p: ProjetoLinha): ProjetoAdmin => ({ ...p, lotes: banco.lotes(p.id) });
+  const projetoAdmin = (p: ProjetoLinha): ProjetoAdmin => ({
+    ...p,
+    lotes: banco.lotes(p.id).map((l) => ({ ...l, planilhas: l.manifesto === 'planilha' ? armazem.planilhas(p.slug, l.chave, l.nome) : [] })),
+  });
 
   app.get('/api/admin/projetos', (_req, res) => {
     res.json(banco.projetos().map(projetoAdmin));
@@ -284,20 +288,23 @@ export function criarApp({ banco, armazem, senhaAdmin, dataDir }: Opcoes) {
 
   const receber = multer({
     dest: join(dataDir, 'tmp'),
-    limits: { fileSize: 2 * 1024 ** 3, files: 2 },
+    limits: { fileSize: 2 * 1024 ** 3, files: MAX_PLANILHAS + 1 },
   }).fields([
-    { name: 'planilha', maxCount: 1 },
+    { name: 'planilhas', maxCount: MAX_PLANILHAS },
     { name: 'zip', maxCount: 1 },
   ]);
 
   app.post('/api/admin/projetos/:slug/upload', receber, async (req, res) => {
     const arquivos = (req.files ?? {}) as Record<string, Express.Multer.File[] | undefined>;
-    const planilha = arquivos.planilha?.[0];
+    const planilhas = arquivos.planilhas ?? [];
     const zip = arquivos.zip?.[0];
+    // O navegador manda o nome do arquivo em UTF-8, mas o multer o lê como latin1.
+    const nomeOriginal = (f: Express.Multer.File) => Buffer.from(f.originalname, 'latin1').toString('utf8');
     try {
       const p = projetoOu404(param(req, 'slug'));
-      if (!planilha && !zip) throw new ErroUsuario('Escolha a planilha (.xlsx), o ZIP com as pastas, ou os dois.');
-      if (planilha && !/\.xlsx$/i.test(planilha.originalname)) throw new ErroUsuario('A planilha precisa ser um arquivo .xlsx.');
+      if (planilhas.length === 0 && !zip) throw new ErroUsuario('Escolha as planilhas (.xlsx), o ZIP com as pastas, ou os dois.');
+      const naoXlsx = planilhas.find((f) => !/\.xlsx$/i.test(f.originalname));
+      if (naoXlsx) throw new ErroUsuario(`"${nomeOriginal(naoXlsx)}" não é uma planilha .xlsx.`);
       if (zip && !/\.zip$/i.test(zip.originalname)) throw new ErroUsuario('As pastas precisam vir num arquivo .zip.');
       const lote = String((req.body as { lote?: unknown } | undefined)?.lote ?? '').trim() || undefined;
       try {
@@ -305,17 +312,27 @@ export function criarApp({ banco, armazem, senhaAdmin, dataDir }: Opcoes) {
           await armazem.instalar({
             projeto: p,
             lote,
-            planilha: planilha ? { caminho: planilha.path, nome: Buffer.from(planilha.originalname, 'latin1').toString('utf8') } : undefined,
+            planilhas: planilhas.map((f) => ({ caminho: f.path, nome: nomeOriginal(f) })),
             zip: zip?.path,
           }),
         );
       } catch (e) {
         if (e instanceof ErroUsuario) throw e;
-        console.error('[upload]', e);
-        throw new ErroUsuario(e instanceof Error ? e.message : 'Não consegui instalar o lote.');
+        const mensagem = e instanceof Error ? e.message : 'Não consegui instalar o lote.';
+        console.warn(`[upload ${p.slug}] ${mensagem}`); // vai para o admin; no log basta uma linha
+        throw new ErroUsuario(mensagem);
       }
     } finally {
-      for (const f of [planilha, zip]) if (f) rmSync(f.path, { force: true });
+      for (const f of [...planilhas, zip]) if (f) rmSync(f.path, { force: true });
+    }
+  });
+
+  app.delete('/api/admin/projetos/:slug/lotes/:chave/planilhas/:nome', async (req, res) => {
+    const p = projetoOu404(param(req, 'slug'));
+    try {
+      res.json(await armazem.removerPlanilha(p, param(req, 'chave'), param(req, 'nome')));
+    } catch (e) {
+      throw new ErroUsuario(e instanceof Error ? e.message : 'Não consegui tirar a planilha.');
     }
   });
 

@@ -8,6 +8,9 @@ import { join, posix, resolve, sep } from 'node:path';
 import readXlsxFile from 'read-excel-file/node';
 import type { Conteudo, Lote, Peca, Tema, Trilha } from './tipos.ts';
 
+/** Pasta do lote onde ficam as planilhas (uma ou mais; não é servida). */
+export const PASTA_PLANILHAS = '_planilhas';
+/** Nome usado por lotes da primeira versão, com uma planilha só. */
 export const ARQUIVO_PLANILHA = '_manifesto.xlsx';
 const EXT_IMAGEM = /\.(jpe?g|png|webp|gif|svg|avif)$/i;
 
@@ -15,8 +18,21 @@ type Json = Record<string, unknown>;
 
 export async function lerLote(dir: string, chave: string): Promise<Lote> {
   if (existsSync(join(dir, 'trilhas.json'))) return lerLoteJson(dir, chave);
-  if (existsSync(join(dir, ARQUIVO_PLANILHA))) return lerLotePlanilha(dir, chave);
+  const planilhas = planilhasDoLote(dir);
+  if (planilhas.length > 0) return lerLotePlanilhas(dir, chave, planilhas);
   throw new Error('O lote não tem manifesto: envie um ZIP com trilhas.json na raiz ou a Planilha de Conteúdo (.xlsx).');
+}
+
+/** Planilhas do lote, em ordem alfabética (a ordem das trilhas segue a das planilhas). */
+export function planilhasDoLote(dir: string): string[] {
+  const pasta = join(dir, PASTA_PLANILHAS);
+  const novas = existsSync(pasta)
+    ? readdirSync(pasta)
+        .filter((n) => /\.xlsx$/i.test(n) && !n.startsWith('~$') && !n.startsWith('.'))
+        .sort(colator.compare)
+        .map((n) => posix.join(PASTA_PLANILHAS, n))
+    : [];
+  return existsSync(join(dir, ARQUIVO_PLANILHA)) ? [ARQUIVO_PLANILHA, ...novas] : novas;
 }
 
 // ---------- utilitários ----------
@@ -317,12 +333,15 @@ function safeJson(arquivo: string): unknown {
   }
 }
 
-async function lerLotePlanilha(dir: string, chave: string): Promise<Lote> {
-  let abas: { sheet: string; data: Celulas[] }[];
+type Aba = { sheet: string; data: Celulas[] };
+
+/** Lê uma planilha e devolve a aba de conteúdos (com o cabeçalho) e os nomes de tema da aba "Trilhas". */
+async function abrirPlanilha(arquivo: string, nome: string) {
+  let abas: Aba[];
   try {
-    abas = await readXlsxFile(join(dir, ARQUIVO_PLANILHA));
+    abas = await readXlsxFile(arquivo);
   } catch {
-    throw new Error('Não consegui abrir a planilha: confira se é um arquivo .xlsx válido.');
+    throw new Error(`Não consegui abrir a planilha "${nome}": confira se é um arquivo .xlsx válido.`);
   }
 
   const candidatas = [...abas].sort(
@@ -336,7 +355,7 @@ async function lerLotePlanilha(dir: string, chave: string): Promise<Lote> {
       break;
     }
   }
-  if (!aba) throw new Error('A planilha não tem uma aba com as colunas ID e Título do conteúdo.');
+  if (!aba) throw new Error(`A planilha "${nome}" não tem uma aba com as colunas ID e Título do conteúdo.`);
 
   // Aba opcional "Trilhas" da Planilha (na plataforma, os temas): ID + nome.
   const nomesTema = new Map<string, { titulo: string; descricao: string }>();
@@ -352,68 +371,86 @@ async function lerLotePlanilha(dir: string, chave: string): Promise<Lote> {
         if (id) nomesTema.set(id, { titulo: texto(l[iNome]), descricao: iDesc >= 0 ? texto(l[iDesc]) : '' });
       }
   }
+  return { ...aba, nomesTema };
+}
 
-  const { cab, linhas } = aba;
-  const val = (l: Celulas, k: Coluna) => {
-    const j = cab.mapa.get(k);
-    return j === undefined ? '' : texto(l[j]);
-  };
-
+/**
+ * Lote com uma ou mais planilhas (tipicamente uma por trilha/eixo). As linhas
+ * de todas se somam: o Eixo de cada linha diz a trilha, e um mesmo Eixo em
+ * planilhas diferentes vira uma trilha só.
+ */
+async function lerLotePlanilhas(dir: string, chave: string, planilhas: string[]): Promise<Lote> {
   const pastas = indicePastas(dir);
   const avisos: string[] = [];
   const conteudos: Record<string, Conteudo> = {};
+  const origem = new Map<string, string>();
   const trilhas: Trilha[] = [];
 
-  for (const l of linhas.slice(cab.inicio)) {
-    const id = val(l, 'id');
-    if (!id) continue;
-    if (conteudos[id]) {
-      avisos.push(`${id}: aparece mais de uma vez na planilha; usei a primeira linha.`);
-      continue;
-    }
-    const eixoBruto = val(l, 'eixo') || 'Conteúdos';
-    const trilhaId = slug(eixoBruto) || 'conteudos';
-    let trilha = trilhas.find((t) => t.id === trilhaId);
-    if (!trilha) {
-      trilha = { id: trilhaId, ...eixo(eixoBruto), descricao: '', capa: null, temas: [] };
-      trilhas.push(trilha);
-    }
-    const temaId = val(l, 'tema') || 'Sem tema';
-    let tema = trilha.temas.find((t) => t.id === temaId);
-    if (!tema) {
-      const nome = nomesTema.get(temaId);
-      tema = { id: temaId, titulo: nome?.titulo || temaId, descricao: nome?.descricao ?? '', itens: [] };
-      trilha.temas.push(tema);
-    }
-
-    const pasta = pastas.get(id.toUpperCase()) ?? null;
-    const cj = pasta && existsSync(join(dir, pasta, 'conteudo.json')) ? obj(safeJson(join(dir, pasta, 'conteudo.json'))) : {};
-    const arquivos: Arquivos = pasta ? arquivosDaPasta(dir, pasta, cj, id, avisos) : { texto: null, pecas: [], imagens: [] };
-    const peca = obj(cj.peca);
-    const titulo = val(l, 'titulo') || id;
-    conteudos[id] = {
-      id,
-      trilhaId,
-      temaId,
-      titulo,
-      objetivo: val(l, 'objetivo'),
-      introducao: val(l, 'introducao'),
-      conteudoPlanejado: val(l, 'conteudo'),
-      formato: val(l, 'formato'),
-      duracao: val(l, 'duracao'),
-      tags: lista(val(l, 'tags')),
-      relacionados: val(l, 'relacionados'),
-      chancela: val(l, 'chancela'),
-      observacoes: val(l, 'observacoes'),
-      modificacao: val(l, 'modificacao'),
-      estado: texto(peca.estado),
-      mensagem: texto(peca.mensagem),
-      pasta,
-      ...arquivos,
+  for (const relativo of planilhas) {
+    const nome = posix.basename(relativo);
+    const { cab, linhas, nomesTema } = await abrirPlanilha(join(dir, relativo), nome);
+    const val = (l: Celulas, k: Coluna) => {
+      const j = cab.mapa.get(k);
+      return j === undefined ? '' : texto(l[j]);
     };
-    tema.itens.push({ id, titulo, ref: false });
+
+    for (const l of linhas.slice(cab.inicio)) {
+      const id = val(l, 'id');
+      if (!id) continue;
+      if (conteudos[id]) {
+        const primeira = origem.get(id);
+        avisos.push(
+          primeira === nome
+            ? `${id}: aparece mais de uma vez na planilha "${nome}"; usei a primeira linha.`
+            : `${id}: aparece nas planilhas "${primeira}" e "${nome}"; usei a de "${primeira}".`,
+        );
+        continue;
+      }
+      const eixoBruto = val(l, 'eixo') || nome.replace(/\.xlsx$/i, '');
+      const trilhaId = slug(eixoBruto) || 'conteudos';
+      let trilha = trilhas.find((t) => t.id === trilhaId);
+      if (!trilha) {
+        trilha = { id: trilhaId, ...eixo(eixoBruto), descricao: '', capa: null, temas: [] };
+        trilhas.push(trilha);
+      }
+      const temaId = val(l, 'tema') || 'Sem tema';
+      let tema = trilha.temas.find((t) => t.id === temaId);
+      if (!tema) {
+        const nomeTema = nomesTema.get(temaId);
+        tema = { id: temaId, titulo: nomeTema?.titulo || temaId, descricao: nomeTema?.descricao ?? '', itens: [] };
+        trilha.temas.push(tema);
+      }
+
+      const pasta = pastas.get(id.toUpperCase()) ?? null;
+      const cj = pasta && existsSync(join(dir, pasta, 'conteudo.json')) ? obj(safeJson(join(dir, pasta, 'conteudo.json'))) : {};
+      const arquivos: Arquivos = pasta ? arquivosDaPasta(dir, pasta, cj, id, avisos) : { texto: null, pecas: [], imagens: [] };
+      const peca = obj(cj.peca);
+      const titulo = val(l, 'titulo') || id;
+      conteudos[id] = {
+        id,
+        trilhaId,
+        temaId,
+        titulo,
+        objetivo: val(l, 'objetivo'),
+        introducao: val(l, 'introducao'),
+        conteudoPlanejado: val(l, 'conteudo'),
+        formato: val(l, 'formato'),
+        duracao: val(l, 'duracao'),
+        tags: lista(val(l, 'tags')),
+        relacionados: val(l, 'relacionados'),
+        chancela: val(l, 'chancela'),
+        observacoes: val(l, 'observacoes'),
+        modificacao: val(l, 'modificacao'),
+        estado: texto(peca.estado),
+        mensagem: texto(peca.mensagem),
+        pasta,
+        ...arquivos,
+      };
+      origem.set(id, nome);
+      tema.itens.push({ id, titulo, ref: false });
+    }
   }
 
-  if (Object.keys(conteudos).length === 0) throw new Error('A planilha não tem nenhuma linha de conteúdo com ID.');
+  if (Object.keys(conteudos).length === 0) throw new Error('As planilhas não têm nenhuma linha de conteúdo com ID.');
   return { chave, nome: chave, manifesto: 'planilha', trilhas, conteudos, avisos };
 }

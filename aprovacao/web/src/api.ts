@@ -99,6 +99,8 @@ export const admin = {
   criarProjeto: (nome: string) => adm<ProjetoAdmin>('/api/admin/projetos', corpo('POST', { nome })),
   projeto: (slug: string) => adm<ProjetoAdmin>(`/api/admin/projetos/${enc(slug)}`),
   removerProjeto: (slug: string) => adm<undefined>(`/api/admin/projetos/${enc(slug)}`, { method: 'DELETE' }),
+  removerPlanilha: (slug: string, chave: string, planilha: string) =>
+    adm<ResultadoUpload>(`/api/admin/projetos/${enc(slug)}/lotes/${enc(chave)}/planilhas/${enc(planilha)}`, { method: 'DELETE' }),
   removerLote: (slug: string, chave: string) => adm<undefined>(`/api/admin/projetos/${enc(slug)}/lotes/${enc(chave)}`, { method: 'DELETE' }),
   revisoras: (slug: string) => adm<Revisora[]>(`/api/admin/projetos/${enc(slug)}/revisoras`),
   criarRevisora: (slug: string, nome: string, papel: string) =>

@@ -158,5 +158,6 @@ export type ProjetoAdmin = {
   nome: string;
   slug: string;
   criadoEm: string;
-  lotes: { chave: string; nome: string; manifesto: Manifesto; enviadoEm: string }[];
+  /** `planilhas`: nomes das planilhas do lote (uma por trilha, se for o caso). */
+  lotes: { chave: string; nome: string; manifesto: Manifesto; enviadoEm: string; planilhas: string[] }[];
 };

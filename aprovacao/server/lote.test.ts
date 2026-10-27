@@ -1,9 +1,9 @@
-import { cpSync, mkdtempSync, renameSync, rmSync, existsSync, readdirSync } from 'node:fs';
+import { copyFileSync, cpSync, mkdirSync, mkdtempSync, renameSync, rmSync, existsSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import AdmZip from 'adm-zip';
 import { afterEach, describe, expect, it } from 'vitest';
-import { ARQUIVO_PLANILHA, lerLote } from './lote.ts';
+import { ARQUIVO_PLANILHA, PASTA_PLANILHAS, lerLote } from './lote.ts';
 import { extrairZip } from './zip.ts';
 
 const exemplo = resolve(import.meta.dirname, '..', 'exemplo');
@@ -69,6 +69,32 @@ describe('manifesto Planilha', () => {
   it('linha sem pasta aparece só com os textos da planilha', async () => {
     const l = await lerLote(preparar(), 'entender');
     expect(l.conteudos['C2.2']).toMatchObject({ pasta: null, pecas: [], imagens: [], texto: null, titulo: 'Quando trocar de vaso' });
+  });
+});
+
+describe('várias planilhas (uma por trilha)', () => {
+  const preparar = (...nomes: [string, string][]) => {
+    const d = tmp();
+    cpSync(join(exemplo, 'planilha-exemplo/pastas'), join(d, 'pastas'), { recursive: true });
+    mkdirSync(join(d, PASTA_PLANILHAS));
+    for (const [origem, destino] of nomes) copyFileSync(join(exemplo, 'planilhas-por-trilha', origem), join(d, PASTA_PLANILHAS, destino));
+    return d;
+  };
+
+  it('soma as planilhas: cada uma traz a sua trilha, na ordem dos nomes', async () => {
+    const l = await lerLote(
+      preparar(['Conteudos-Praticar.xlsx', 'Conteudos-Praticar.xlsx'], ['Conteudos-Entender.xlsx', 'Conteudos-Entender.xlsx']),
+      'trilhas',
+    );
+    expect(l.trilhas.map((t) => t.titulo)).toEqual(['Entender', 'Praticar']);
+    expect(Object.keys(l.conteudos).sort()).toEqual(['C1.1', 'C1.2', 'C2.1', 'C2.2']);
+    expect(l.conteudos['C1.1']!.imagens).toHaveLength(4);
+    expect(l.avisos).toEqual([]);
+  });
+
+  it('ID repetido em duas planilhas vira aviso e vale a primeira', async () => {
+    const l = await lerLote(preparar(['Conteudos-Entender.xlsx', 'Conteudos-Entender.xlsx'], ['Conteudos-Entender.xlsx', 'Copia.xlsx']), 'x');
+    expect(l.avisos).toContain('C1.1: aparece nas planilhas "Conteudos-Entender.xlsx" e "Copia.xlsx"; usei a de "Conteudos-Entender.xlsx".');
   });
 });
 
