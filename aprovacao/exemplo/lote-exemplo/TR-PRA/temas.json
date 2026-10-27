@@ -1,0 +1,32 @@
+{
+  "trilha": "TR-PRA",
+  "temas": [
+    {
+      "id": "T2",
+      "ordem": 1,
+      "titulo": "Primeiros vasos",
+      "descricao_breve": "Tema de exemplo T2.",
+      "pasta": "t2-primeiros-vasos",
+      "conteudos": [
+        {
+          "id": "C2.1",
+          "titulo": "Montando o primeiro vaso",
+          "descricao": "Montar um vaso com drenagem, substrato e planta, passo a passo.",
+          "pasta": "C2.1-montando-o-primeiro-vaso"
+        },
+        {
+          "id": "C2.2",
+          "titulo": "Quando trocar de vaso",
+          "descricao": "Identificar os sinais de que a planta precisa de mais espaço.",
+          "pasta": "C2.2-quando-trocar-de-vaso"
+        },
+        {
+          "id": "C1.1",
+          "titulo": "Quanta luz cada planta pede",
+          "descricao": "",
+          "ref": "C1.1"
+        }
+      ]
+    }
+  ]
+}

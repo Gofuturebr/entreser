@@ -1,0 +1,45 @@
+{
+  "id": "C1.1",
+  "tema": "T1",
+  "trilha": "TR-ENT",
+  "skin": "carrossel",
+  "titulo": "Quanta luz cada planta pede",
+  "descricao": "Reconhecer os três níveis de luz e onde cada planta se sente bem.",
+  "introducao": "Antes de escolher o vaso, vale olhar para a janela. A luz que entra decide quase tudo.",
+  "conteudo_planejado": "Luz direta, luz indireta e meia-sombra, com exemplos de plantas para cada uma.",
+  "duracao_min": 2.0,
+  "densidade": "medio",
+  "tags": [
+    "exemplo",
+    "carrossel"
+  ],
+  "relacionados": [],
+  "chancela": "Exemplo",
+  "formato_planejado": "Texto + carrossel",
+  "observacoes": "Conteúdo fictício para testar a ferramenta.",
+  "peca": {
+    "estado": "pronta",
+    "arquivo": "peca.html"
+  },
+  "arquivos": {
+    "texto": "texto.md",
+    "capa": null,
+    "pecas": [
+      {
+        "skin": "carrossel",
+        "html": "peca.html",
+        "dados": null
+      }
+    ],
+    "imagens": [
+      "imagens/quanta-luz-01.jpg",
+      "imagens/quanta-luz-02.jpg",
+      "imagens/quanta-luz-03.jpg",
+      "imagens/quanta-luz-04.jpg"
+    ],
+    "fontes": null,
+    "producao": [
+      "_mapa.md"
+    ]
+  }
+}

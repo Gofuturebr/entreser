@@ -4,6 +4,12 @@ Protótipo mobile-first (390px) de interface conversacional para bem-estar
 mental de mulheres em tratamento de fertilidade/FIV. Público sensível:
 os guardrails de segurança são NÃO-NEGOCIÁVEIS.
 
+## Outro app neste repositório: `aprovacao/`
+`aprovacao/` é o painel de aprovação de conteúdo com clientes (Marcas
+Educadoras). É independente da Serena: tem `package.json`, README e testes
+próprios. As specs, as travas de escopo (só E5, front-end antes do
+back-end) e as regras de estilo da Serena **não** se aplicam a ele.
+
 ## Ordem de leitura das especificações (LEIA NESTA ORDEM antes de planejar)
 1. @specs/00-constitution.md         — princípios não-negociáveis (precede tudo)
 2. @specs/03-product-interactions.md — produto: O QUE a Serena faz e diz, e POR QUÊ, por fase (E1–E7)

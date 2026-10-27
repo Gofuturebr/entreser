@@ -1,0 +1,34 @@
+{
+  "id": "C2.2",
+  "tema": "T2",
+  "trilha": "TR-PRA",
+  "skin": "texto",
+  "titulo": "Quando trocar de vaso",
+  "descricao": "Identificar os sinais de que a planta precisa de mais espaço.",
+  "introducao": "Raiz saindo pelo furo é o recado mais claro. Mas há outros.",
+  "conteudo_planejado": "Sinais de vaso pequeno, época certa para trocar e como fazer sem estresse.",
+  "duracao_min": 1.5,
+  "densidade": "medio",
+  "tags": [
+    "exemplo",
+    "texto"
+  ],
+  "relacionados": [],
+  "chancela": "Exemplo",
+  "formato_planejado": "Texto",
+  "observacoes": "Conteúdo fictício para testar a ferramenta.",
+  "peca": {
+    "estado": "pendente",
+    "arquivo": null
+  },
+  "arquivos": {
+    "texto": "texto.md",
+    "capa": null,
+    "pecas": [],
+    "imagens": [],
+    "fontes": null,
+    "producao": [
+      "_mapa.md"
+    ]
+  }
+}

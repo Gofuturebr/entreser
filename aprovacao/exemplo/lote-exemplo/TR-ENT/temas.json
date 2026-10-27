@@ -1,0 +1,26 @@
+{
+  "trilha": "TR-ENT",
+  "temas": [
+    {
+      "id": "T1",
+      "ordem": 1,
+      "titulo": "Luz e água",
+      "descricao_breve": "Tema de exemplo T1.",
+      "pasta": "t1-luz-e-agua",
+      "conteudos": [
+        {
+          "id": "C1.1",
+          "titulo": "Quanta luz cada planta pede",
+          "descricao": "Reconhecer os três níveis de luz e onde cada planta se sente bem.",
+          "pasta": "C1.1-quanta-luz-cada-planta-pede"
+        },
+        {
+          "id": "C1.2",
+          "titulo": "Regar sem afogar",
+          "descricao": "Saber quando a terra pede água e quando pede espera.",
+          "pasta": "C1.2-regar-sem-afogar"
+        }
+      ]
+    }
+  ]
+}

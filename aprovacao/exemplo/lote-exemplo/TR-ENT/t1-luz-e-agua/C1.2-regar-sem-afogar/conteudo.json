@@ -1,0 +1,40 @@
+{
+  "id": "C1.2",
+  "tema": "T1",
+  "trilha": "TR-ENT",
+  "skin": "flashcards",
+  "titulo": "Regar sem afogar",
+  "descricao": "Saber quando a terra pede água e quando pede espera.",
+  "introducao": "Mais plantas se perdem por excesso de água do que por falta. O dedo na terra é o melhor medidor.",
+  "conteudo_planejado": "O teste do dedo, sinais de excesso e de falta, frequência por estação.",
+  "duracao_min": 1.5,
+  "densidade": "medio",
+  "tags": [
+    "exemplo",
+    "flashcards"
+  ],
+  "relacionados": [],
+  "chancela": "Exemplo",
+  "formato_planejado": "Texto + flashcards",
+  "observacoes": "Conteúdo fictício para testar a ferramenta.",
+  "peca": {
+    "estado": "pronta",
+    "arquivo": "peca.html"
+  },
+  "arquivos": {
+    "texto": "texto.md",
+    "capa": null,
+    "pecas": [
+      {
+        "skin": "flashcards",
+        "html": "peca.html",
+        "dados": null
+      }
+    ],
+    "imagens": [],
+    "fontes": null,
+    "producao": [
+      "_mapa.md"
+    ]
+  }
+}

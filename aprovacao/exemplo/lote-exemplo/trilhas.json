@@ -1,0 +1,30 @@
+{
+  "formato": "1.1",
+  "lote": {
+    "nome": "Exemplo · Jardinagem em casa",
+    "fase": "F1",
+    "gerado_em": "2026-10-27",
+    "origem": "Planilha-exemplo.xlsx"
+  },
+  "skins": {},
+  "trilhas": [
+    {
+      "id": "TR-ENT",
+      "titulo": "Entender",
+      "subtitulo": "Base",
+      "descricao": "O que a planta precisa para viver bem.",
+      "abertura": null,
+      "capa": null,
+      "pasta": "TR-ENT"
+    },
+    {
+      "id": "TR-PRA",
+      "titulo": "Praticar",
+      "subtitulo": "Mão na massa",
+      "descricao": "Do vaso vazio à planta no lugar.",
+      "abertura": null,
+      "capa": null,
+      "pasta": "TR-PRA"
+    }
+  ]
+}
