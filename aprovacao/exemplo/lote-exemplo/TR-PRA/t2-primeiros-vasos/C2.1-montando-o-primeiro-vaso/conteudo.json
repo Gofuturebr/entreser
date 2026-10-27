@@ -1,0 +1,42 @@
+{
+  "id": "C2.1",
+  "tema": "T2",
+  "trilha": "TR-PRA",
+  "skin": "infografico",
+  "titulo": "Montando o primeiro vaso",
+  "descricao": "Montar um vaso com drenagem, substrato e planta, passo a passo.",
+  "introducao": "Um vaso bem montado dispensa metade dos cuidados depois. São só quatro camadas.",
+  "conteudo_planejado": "Furo, drenagem, manta, substrato e plantio, em um infográfico de camadas.",
+  "duracao_min": 2.0,
+  "densidade": "medio",
+  "tags": [
+    "exemplo",
+    "infografico"
+  ],
+  "relacionados": [],
+  "chancela": "Exemplo",
+  "formato_planejado": "Texto + infográfico",
+  "observacoes": "Conteúdo fictício para testar a ferramenta.",
+  "peca": {
+    "estado": "pronta",
+    "arquivo": "peca.html"
+  },
+  "arquivos": {
+    "texto": "texto.md",
+    "capa": null,
+    "pecas": [
+      {
+        "skin": "infografico",
+        "html": "peca.html",
+        "dados": null
+      }
+    ],
+    "imagens": [
+      "imagens/montando-o-01.jpg"
+    ],
+    "fontes": null,
+    "producao": [
+      "_mapa.md"
+    ]
+  }
+}
