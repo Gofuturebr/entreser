@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { Alvo, DetalheConteudo, StatusDecisao } from '../../../../server/tipos.ts';
 import { api, urlArquivo } from '../../api.ts';
 import { FormApontamento, ListaApontamentos } from '../../componentes/Apontamentos.tsx';
 import { Markdown } from '../../componentes/Markdown.tsx';
 import { QuemDecidiu, Selo } from '../../componentes/Selo.tsx';
+import { AprovarItem, SeloVersao } from '../../componentes/Versao.tsx';
+import { ITEM_TEXTO, itemImagem, itemPeca } from '../../../../server/itens.ts';
 import { mensagem, nomeArquivo, useCarregar } from '../../util.ts';
 import { ordemDeLeitura, rota, useProjeto } from './contexto.ts';
 
@@ -37,6 +39,10 @@ export function Conteudo() {
   };
   const apontar = async (alvo: Alvo, texto: string, imagem?: string) =>
     atualizar(await api.apontar(projeto.slug, lote, id, { revisoraId: revisora.id, alvo, texto, ...(imagem ? { imagem } : {}) }));
+  const aprovar = (item: string) => async (aprovado: boolean) =>
+    atualizar(await api.aprovarItem(projeto.slug, lote, id, revisora.id, item, aprovado));
+  const botaoAprovado = (item: string) => <AprovarItem info={d.itens[item]} revisoraId={revisora.id} aoMudar={aprovar(item)} />;
+  const aprovadoPorMim = (item: string) => !!d.itens[item]?.aprovacoes.some((a) => a.revisoraId === revisora.id && !a.desatualizada);
 
   const ordem = ordemDeLeitura(lotes);
   const pos = ordem.findIndex((o) => o.lote === lote && o.id === id);
@@ -64,6 +70,7 @@ export function Conteudo() {
         <h1>{c.titulo}</h1>
         <div className="estado-conteudo">
           <Selo status={d.resumo.status} abertos={d.resumo.abertos} />
+          <SeloVersao versao={d.resumo.versao} atualizadoEm={d.resumo.atualizadoEm} rotulo="atualizado" />
           <QuemDecidiu decisoes={d.resumo.decisoes} />
         </div>
         {d.resumo.decisoes.some((x) => x.desatualizada) && (
@@ -77,8 +84,11 @@ export function Conteudo() {
         </p>
       )}
 
-      <section className="secao">
-        <h2>Texto</h2>
+      <section className={`secao ${aprovadoPorMim(ITEM_TEXTO) ? 'aprovada' : ''}`}>
+        <h2 className="titulo-com-selo">
+          Texto
+          <SeloVersao versao={d.itens[ITEM_TEXTO]?.versao ?? 1} atualizadoEm={d.itens[ITEM_TEXTO]?.atualizadoEm ?? null} />
+        </h2>
         {c.objetivo && (
           <div className="campo">
             <span className="rotulo">Objetivo</span>
@@ -111,22 +121,24 @@ export function Conteudo() {
           rotulo="Pedir ajuste de texto ou formato"
           dica="Ex.: trocar a palavra X por Y no 2º parágrafo; este conteúdo funcionaria melhor como carrossel…"
           aoEnviar={(alvo, texto) => apontar(alvo, texto)}
+          extra={botaoAprovado(ITEM_TEXTO)}
         />
       </section>
 
-      <Pecas d={d} slug={projeto.slug} lote={lote} />
+      <Pecas d={d} slug={projeto.slug} lote={lote} botaoAprovado={botaoAprovado} aprovadoPorMim={aprovadoPorMim} />
 
       {c.imagens.length > 0 && (
         <section className="secao">
           <h2>Imagens ({c.imagens.length})</h2>
-          <p className="suave pequeno">Aponte ajustes em cada imagem, uma a uma.</p>
+          <p className="suave pequeno">Aprove ou aponte ajustes em cada imagem, uma a uma.</p>
           <ol className="imagens">
             {c.imagens.map((img, i) => {
               const url = urlArquivo(projeto.slug, lote, img);
               return (
-                <li key={img} className="imagem">
+                <li key={img} className={`imagem ${aprovadoPorMim(itemImagem(img)) ? 'aprovada' : ''}`}>
                   <span className="imagem-numero">
                     Imagem {i + 1} de {c.imagens.length}
+                    <SeloVersao versao={d.itens[itemImagem(img)]?.versao ?? 1} atualizadoEm={d.itens[itemImagem(img)]?.atualizadoEm ?? null} />
                   </span>
                   <a href={url} target="_blank" rel="noreferrer" title="Abrir em tamanho real">
                     <img src={url} alt={`Imagem ${i + 1}: ${nomeArquivo(img)}`} loading="lazy" />
@@ -137,6 +149,7 @@ export function Conteudo() {
                     rotulo={`Ajuste na imagem ${i + 1}`}
                     dica="O que mudar nesta imagem?"
                     aoEnviar={(alvo, texto) => apontar(alvo, texto, img)}
+                    extra={botaoAprovado(itemImagem(img))}
                   />
                 </li>
               );
@@ -195,7 +208,15 @@ function MaisDetalhes({ d }: { d: DetalheConteudo }) {
   );
 }
 
-function Pecas({ d, slug, lote }: { d: DetalheConteudo; slug: string; lote: string }) {
+type PropsPecas = {
+  d: DetalheConteudo;
+  slug: string;
+  lote: string;
+  botaoAprovado: (item: string) => ReactNode;
+  aprovadoPorMim: (item: string) => boolean;
+};
+
+function Pecas({ d, slug, lote, botaoAprovado, aprovadoPorMim }: PropsPecas) {
   const c = d.conteudo;
   const [aba, setAba] = useState(0);
   if (c.pecas.length === 0) {
@@ -218,9 +239,14 @@ function Pecas({ d, slug, lote }: { d: DetalheConteudo; slug: string; lote: stri
   const peca = c.pecas[Math.min(aba, c.pecas.length - 1)];
   if (!peca) return null;
   const url = urlArquivo(slug, lote, peca.html);
+  const item = itemPeca(peca.html);
+  const info = d.itens[item];
   return (
-    <section className="secao">
-      <h2>{c.pecas.length > 1 ? 'Peças' : 'Peça'}</h2>
+    <section className={`secao ${aprovadoPorMim(item) ? 'aprovada' : ''}`}>
+      <h2 className="titulo-com-selo">
+        {c.pecas.length > 1 ? 'Peças' : 'Peça'}
+        <SeloVersao versao={info?.versao ?? 1} atualizadoEm={info?.atualizadoEm ?? null} />
+      </h2>
       {c.pecas.length > 1 && (
         <div className="alternar">
           {c.pecas.map((p, i) => (
@@ -233,9 +259,12 @@ function Pecas({ d, slug, lote }: { d: DetalheConteudo; slug: string; lote: stri
       <div className="moldura-peca">
         <iframe key={url} src={url} title={`Peça ${peca.skin || ''} de ${c.titulo}`} sandbox="allow-scripts allow-popups" loading="lazy" />
       </div>
-      <a className="link pequeno" href={url} target="_blank" rel="noreferrer">
-        Abrir a peça em tela cheia ↗
-      </a>
+      <div className="acoes-peca">
+        {botaoAprovado(item)}
+        <a className="link pequeno" href={url} target="_blank" rel="noreferrer">
+          Abrir em tela cheia ↗
+        </a>
+      </div>
     </section>
   );
 }

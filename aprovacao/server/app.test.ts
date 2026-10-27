@@ -124,6 +124,37 @@ describe('fluxo de aprovação', () => {
     expect(d.conteudo.texto).toBe('Texto revisado.');
     expect(d.apontamentos).toHaveLength(2);
     expect(d.resumo.decisoes[0]).toMatchObject({ status: 'ajustes', desatualizada: true });
+    // Só o texto mudou: ele vai para a v2; peça e imagens continuam na v1.
+    expect(d.resumo.versao).toBe(2);
+    expect(d.itens.texto!.versao).toBe(2);
+    expect(d.itens[`imagem:${d.conteudo.imagens[0]}`]!.versao).toBe(1);
+    expect(d.apontamentos.find((a) => a.alvo === 'texto')).toMatchObject({ versao: 1, versaoAtual: 2 });
+    expect(d.apontamentos.find((a) => a.alvo === 'imagem')).toMatchObject({ versao: 1, versaoAtual: 1 });
+  });
+
+  it('"Aprovado" num item guarda a versão e vira "versão anterior" quando a imagem é corrigida', async () => {
+    const url = `/api/p/${slug}/l/f1/c/C1.1/itens`;
+    const d0 = (await (await fetch(`${base}/api/p/${slug}/l/f1/c/C1.1`)).json()) as DetalheConteudo;
+    const item = `imagem:${d0.conteudo.imagens[0]}`;
+    const d1 = (await (await json(url, 'PUT', { revisoraId: ana.id, item, aprovado: true })).json()) as DetalheConteudo;
+    expect(d1.itens[item]!.aprovacoes).toMatchObject([{ revisora: 'Ana', versao: 1, desatualizada: false }]);
+    expect((await json(url, 'PUT', { revisoraId: ana.id, item: 'imagem:inventada.jpg', aprovado: true })).status).toBe(400);
+
+    const pasta = mkdtempSync(join(dataDir, 'img-'));
+    const z = new AdmZip();
+    z.addLocalFolder(join(exemplo, 'lote-exemplo/TR-ENT/t1-luz-e-agua/C1.1-quanta-luz-cada-planta-pede'));
+    z.updateFile('texto.md', Buffer.from('Texto revisado.'));
+    z.updateFile('imagens/quanta-luz-01.jpg', readFileSync(join(exemplo, 'lote-exemplo/TR-PRA/t2-primeiros-vasos/C2.1-montando-o-primeiro-vaso/imagens/montando-o-01.jpg')));
+    z.writeZip(join(pasta, 'c.zip'));
+    expect(((await (await enviar(slug, { zip: join(pasta, 'c.zip') })).json()) as ResultadoUpload).atualizados).toEqual(['C1.1']);
+
+    const d2 = (await (await fetch(`${base}/api/p/${slug}/l/f1/c/C1.1`)).json()) as DetalheConteudo;
+    expect(d2.resumo.versao).toBe(3);
+    expect(d2.itens.texto!.versao).toBe(2);
+    expect(d2.itens[item]).toMatchObject({ versao: 2, aprovacoes: [{ versao: 1, desatualizada: true }] });
+
+    const d3 = (await (await json(url, 'PUT', { revisoraId: ana.id, item, aprovado: false })).json()) as DetalheConteudo;
+    expect(d3.itens[item]!.aprovacoes).toEqual([]);
   });
 
   it('sobe lote por planilha + ZIP de pastas e depois troca só a planilha', async () => {
@@ -139,6 +170,16 @@ describe('fluxo de aprovação', () => {
     expect(d.conteudo.imagens).toHaveLength(4); // arquivos do envio anterior continuam
   });
 
+  it('conteúdo isolado com ID em dois lotes pede a escolha do lote', async () => {
+    const pasta = mkdtempSync(join(dataDir, 'amb-'));
+    const zip = zipDe(join(exemplo, 'lote-exemplo/TR-ENT/t1-luz-e-agua/C1.2-regar-sem-afogar'), join(pasta, 'c.zip'));
+    const r = await enviar(slug, { zip });
+    expect(r.status).toBe(400);
+    expect(((await r.json()) as { erro: string }).erro).toMatch(/mais de um lote/);
+    const ok = (await (await enviar(slug, { zip }, 'f1')).json()) as ResultadoUpload;
+    expect(ok).toMatchObject({ tipo: 'conteudo', chave: 'f1' });
+  });
+
   it('upload sem manifesto devolve mensagem clara', async () => {
     const pasta = mkdtempSync(join(dataDir, 'vazio-'));
     writeFileSync(join(pasta, 'leia.txt'), 'nada');
@@ -151,6 +192,7 @@ describe('fluxo de aprovação', () => {
     const md = await (await admin(`/api/admin/projetos/${slug}/exportar?formato=md`)).text();
     expect(md).toContain('### C1.1 · Quanta luz cada planta pede');
     expect(md).toContain('**Imagem quanta-luz-03.jpg** · Ana');
+    expect(md).toMatch(/\*\*Texto\*\* · Ana · .* · v1 \(já há v2\)/);
     const bytes = Buffer.from(await (await admin(`/api/admin/projetos/${slug}/exportar?formato=csv`)).arrayBuffer());
     expect([...bytes.subarray(0, 3)]).toEqual([0xef, 0xbb, 0xbf]); // BOM: acentos certos no Excel
     const csv = bytes.toString('utf8');

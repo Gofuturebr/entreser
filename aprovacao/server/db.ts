@@ -58,10 +58,40 @@ CREATE TABLE IF NOT EXISTS versao (
   atualizado_em TEXT NOT NULL,
   PRIMARY KEY (projeto_id, lote, conteudo_id)
 );
+-- Versão de cada item revisável: "texto", "peca:<arquivo>" ou "imagem:<arquivo>".
+CREATE TABLE IF NOT EXISTS versao_item (
+  projeto_id INTEGER NOT NULL REFERENCES projeto(id) ON DELETE CASCADE,
+  lote TEXT NOT NULL,
+  conteudo_id TEXT NOT NULL,
+  item TEXT NOT NULL,
+  hash TEXT NOT NULL,
+  numero INTEGER NOT NULL,
+  atualizado_em TEXT NOT NULL,
+  PRIMARY KEY (projeto_id, lote, conteudo_id, item)
+);
+-- "Aprovado" dado a um item, guardando a versão que a revisora viu.
+CREATE TABLE IF NOT EXISTS aprovacao_item (
+  projeto_id INTEGER NOT NULL REFERENCES projeto(id) ON DELETE CASCADE,
+  lote TEXT NOT NULL,
+  conteudo_id TEXT NOT NULL,
+  item TEXT NOT NULL,
+  revisora_id INTEGER NOT NULL REFERENCES revisora(id),
+  numero INTEGER NOT NULL,
+  em TEXT NOT NULL,
+  PRIMARY KEY (projeto_id, lote, conteudo_id, item, revisora_id)
+);
 `;
+
+/** Colunas acrescentadas depois da primeira versão: bancos antigos ganham a coluna ao abrir. */
+const COLUNAS_NOVAS: [tabela: string, coluna: string, definicao: string][] = [
+  ['versao', 'numero', 'INTEGER NOT NULL DEFAULT 1'],
+  ['apontamento', 'versao', 'INTEGER'],
+];
 
 export type ProjetoLinha = { id: number; slug: string; nome: string; criadoEm: string };
 export type LoteLinha = { chave: string; nome: string; manifesto: Manifesto; enviadoEm: string };
+export type VersaoLinha = { numero: number; atualizadoEm: string };
+export type AprovacaoItemLinha = { item: string; revisoraId: number; revisora: string; numero: number; em: string };
 export type DecisaoLinha = {
   lote: string;
   conteudoId: string;
@@ -86,6 +116,8 @@ function apontamento(l: Linha): Apontamento {
     texto: String(l.texto),
     criadoEm: String(l.criado_em),
     resolvidoEm: l.resolvido_em === null ? null : String(l.resolvido_em),
+    versao: l.versao === null || l.versao === undefined ? null : Number(l.versao),
+    versaoAtual: null,
   };
 }
 
@@ -98,6 +130,23 @@ export function abrirBanco(arquivo: string) {
   const db = new DatabaseSync(arquivo);
   db.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
   db.exec(ESQUEMA);
+  for (const [tabela, coluna, definicao] of COLUNAS_NOVAS)
+    if (!db.prepare(`SELECT 1 FROM pragma_table_info('${tabela}') WHERE name = ?`).get(coluna))
+      db.exec(`ALTER TABLE ${tabela} ADD COLUMN ${coluna} ${definicao}`);
+
+  /** Grava o hash; sobe o número da versão quando o hash muda. Devolve true se mudou (ou é novo). */
+  const registrar = (tabela: 'versao' | 'versao_item', chave: Record<string, string | number>, hash: string): boolean => {
+    const colunas = Object.keys(chave);
+    const onde = colunas.map((c) => `${c} = ?`).join(' AND ');
+    const atual = db.prepare(`SELECT hash, numero FROM ${tabela} WHERE ${onde}`).get(...Object.values(chave));
+    if (atual && atual.hash === hash) return false;
+    const numero = atual ? Number(atual.numero) + 1 : 1;
+    db.prepare(
+      `INSERT INTO ${tabela} (${colunas.join(', ')}, hash, numero, atualizado_em) VALUES (${colunas.map(() => '?').join(', ')}, ?, ?, ?)
+       ON CONFLICT (${colunas.join(', ')}) DO UPDATE SET hash = excluded.hash, numero = excluded.numero, atualizado_em = excluded.atualizado_em`,
+    ).run(...Object.values(chave), hash, numero, agora());
+    return true;
+  };
 
   const projeto = (l: Linha | undefined): ProjetoLinha | null =>
     l ? { id: Number(l.id), slug: String(l.slug), nome: String(l.nome), criadoEm: String(l.criado_em) } : null;
@@ -118,7 +167,7 @@ export function abrirBanco(arquivo: string) {
     removerProjeto(id: number): void {
       db.exec('BEGIN');
       try {
-        for (const t of ['apontamento', 'decisao', 'versao', 'lote', 'revisora'])
+        for (const t of ['apontamento', 'decisao', 'aprovacao_item', 'versao_item', 'versao', 'lote', 'revisora'])
           db.prepare(`DELETE FROM ${t} WHERE projeto_id = ?`).run(id);
         db.prepare('DELETE FROM projeto WHERE id = ?').run(id);
         db.exec('COMMIT');
@@ -172,10 +221,12 @@ export function abrirBanco(arquivo: string) {
       db.prepare('UPDATE revisora SET ativa = 0 WHERE id = ? AND projeto_id = ?').run(id, projetoId);
     },
 
-    criarApontamento(a: { projetoId: number; lote: string; conteudoId: string; alvo: Alvo; imagem: string | null; revisoraId: number; texto: string }): void {
+    criarApontamento(a: {
+      projetoId: number; lote: string; conteudoId: string; alvo: Alvo; imagem: string | null; revisoraId: number; texto: string; versao: number | null;
+    }): void {
       db.prepare(
-        'INSERT INTO apontamento (projeto_id, lote, conteudo_id, alvo, imagem, revisora_id, texto, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      ).run(a.projetoId, a.lote, a.conteudoId, a.alvo, a.imagem, a.revisoraId, a.texto, agora());
+        'INSERT INTO apontamento (projeto_id, lote, conteudo_id, alvo, imagem, revisora_id, texto, criado_em, versao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      ).run(a.projetoId, a.lote, a.conteudoId, a.alvo, a.imagem, a.revisoraId, a.texto, agora(), a.versao);
     },
     apontamentos(projetoId: number, filtro: { lote?: string; conteudoId?: string } = {}): Apontamento[] {
       let sql = `${SELECT_APONTAMENTO} WHERE a.projeto_id = ?`;
@@ -226,23 +277,53 @@ export function abrirBanco(arquivo: string) {
         }));
     },
 
-    versoes(projetoId: number, lote: string): Map<string, string> {
-      const m = new Map<string, string>();
-      for (const l of db.prepare('SELECT conteudo_id, atualizado_em FROM versao WHERE projeto_id = ? AND lote = ?').all(projetoId, lote))
-        m.set(String(l.conteudo_id), String(l.atualizado_em));
+    /** Versão de cada conteúdo do lote, por id. */
+    versoes(projetoId: number, lote: string): Map<string, VersaoLinha> {
+      const m = new Map<string, VersaoLinha>();
+      for (const l of db.prepare('SELECT conteudo_id, numero, atualizado_em FROM versao WHERE projeto_id = ? AND lote = ?').all(projetoId, lote))
+        m.set(String(l.conteudo_id), { numero: Number(l.numero), atualizadoEm: String(l.atualizado_em) });
       return m;
     },
-    /** Grava o hash do conteúdo; devolve true quando ele mudou (ou é novo). */
     registrarVersao(projetoId: number, lote: string, conteudoId: string, hash: string): boolean {
-      const atual = db
-        .prepare('SELECT hash FROM versao WHERE projeto_id = ? AND lote = ? AND conteudo_id = ?')
-        .get(projetoId, lote, conteudoId);
-      if (atual && atual.hash === hash) return false;
+      return registrar('versao', { projeto_id: projetoId, lote, conteudo_id: conteudoId }, hash);
+    },
+    /** Versão de cada item, por "conteudo\u0000item" (ou só "item" quando se filtra um conteúdo). */
+    versoesItens(projetoId: number, lote: string, conteudoId?: string): Map<string, VersaoLinha> {
+      const m = new Map<string, VersaoLinha>();
+      const linhas = conteudoId
+        ? db.prepare('SELECT * FROM versao_item WHERE projeto_id = ? AND lote = ? AND conteudo_id = ?').all(projetoId, lote, conteudoId)
+        : db.prepare('SELECT * FROM versao_item WHERE projeto_id = ? AND lote = ?').all(projetoId, lote);
+      for (const l of linhas)
+        m.set(conteudoId ? String(l.item) : `${String(l.conteudo_id)}\u0000${String(l.item)}`, {
+          numero: Number(l.numero),
+          atualizadoEm: String(l.atualizado_em),
+        });
+      return m;
+    },
+    registrarVersaoItem(projetoId: number, lote: string, conteudoId: string, item: string, hash: string): boolean {
+      return registrar('versao_item', { projeto_id: projetoId, lote, conteudo_id: conteudoId, item }, hash);
+    },
+
+    aprovarItem(a: { projetoId: number; lote: string; conteudoId: string; item: string; revisoraId: number; numero: number }, aprovado: boolean): void {
+      if (!aprovado) {
+        db.prepare('DELETE FROM aprovacao_item WHERE projeto_id = ? AND lote = ? AND conteudo_id = ? AND item = ? AND revisora_id = ?').run(
+          a.projetoId, a.lote, a.conteudoId, a.item, a.revisoraId,
+        );
+        return;
+      }
       db.prepare(
-        `INSERT INTO versao (projeto_id, lote, conteudo_id, hash, atualizado_em) VALUES (?, ?, ?, ?, ?)
-         ON CONFLICT (projeto_id, lote, conteudo_id) DO UPDATE SET hash = excluded.hash, atualizado_em = excluded.atualizado_em`,
-      ).run(projetoId, lote, conteudoId, hash, agora());
-      return true;
+        `INSERT INTO aprovacao_item (projeto_id, lote, conteudo_id, item, revisora_id, numero, em) VALUES (?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT (projeto_id, lote, conteudo_id, item, revisora_id) DO UPDATE SET numero = excluded.numero, em = excluded.em`,
+      ).run(a.projetoId, a.lote, a.conteudoId, a.item, a.revisoraId, a.numero, agora());
+    },
+    aprovacoesItens(projetoId: number, lote: string, conteudoId: string): AprovacaoItemLinha[] {
+      return db
+        .prepare(
+          `SELECT ai.*, r.nome AS revisora FROM aprovacao_item ai JOIN revisora r ON r.id = ai.revisora_id
+           WHERE ai.projeto_id = ? AND ai.lote = ? AND ai.conteudo_id = ? ORDER BY r.nome COLLATE NOCASE`,
+        )
+        .all(projetoId, lote, conteudoId)
+        .map((l) => ({ item: String(l.item), revisoraId: Number(l.revisora_id), revisora: String(l.revisora), numero: Number(l.numero), em: String(l.em) }));
     },
   };
 }

@@ -53,11 +53,19 @@ Tudo o que o app guarda fica em `data/`: o banco `aprovacao.db` e os lotes envia
 - Um campo para **pedir ajuste de texto ou formato**.
 - A **peça** (`.html` da pasta) embutida, com opção de abrir em tela cheia.
 - As **imagens, uma a uma**, cada uma com o seu campo de ajuste.
-- **Aprovar** ou **Pedir ajustes** (decisão por revisora).
+- Um botão **Aprovado** no texto, na peça e em cada imagem, para aprovar item por item (com "desfazer").
+- **Aprovar** ou **Pedir ajustes** o conteúdo inteiro (decisão por revisora, no rodapé).
 
-### Reenvios não apagam nada
+### Versões e reenvios
 
-Apontamentos e decisões ficam presos ao **ID do conteúdo**. Ao reenviar, o app compara o que a revisora vê (textos, peça, imagens). Se um conteúdo mudou, as decisões antigas dele aparecem como "versão anterior" e ele volta a pedir revisão. Os apontamentos continuam visíveis até você marcá-los como resolvidos.
+Apontamentos e decisões ficam presos ao **ID do conteúdo**, então reenviar não apaga nada. A cada envio, o app compara cada item com o envio anterior: o texto (todos os campos de texto juntos), cada peça e cada imagem.
+
+- **O que mudou ganha versão nova.** O selo **"v2 · corrigida em dd/mm"** aparece no item, e o conteúdo mostra "v3 · atualizado em dd/mm" no topo e na lista. O primeiro envio é a v1, que não leva selo.
+- **"Aprovado" num item que depois mudou** aparece como "aprovou a v1", e a revisora pode aprovar a versão nova.
+- **A decisão sobre o conteúdo inteiro** feita antes de uma mudança aparece como "versão anterior", e o conteúdo volta a pedir revisão.
+- **Cada apontamento guarda a versão** sobre a qual foi feito. Quando já existe correção, ele mostra **"feito na v1 · já há v2"**, na tela da revisora, no admin e na exportação. Assim você vê o que já pode marcar como resolvido.
+
+Para reenviar só um conteúdo cujo ID aparece em mais de um lote, escolha o lote no campo "Lote".
 
 ### Arquivos servidos
 

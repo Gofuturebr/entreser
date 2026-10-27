@@ -6,6 +6,7 @@ import {
 } from 'node:fs';
 import { join } from 'node:path';
 import type { Banco, ProjetoLinha } from './db.ts';
+import { ITEM_TEXTO, itemImagem, itemPeca } from './itens.ts';
 import { ARQUIVO_PLANILHA, lerLote, slug } from './lote.ts';
 import type { Conteudo, Lote, ResultadoUpload } from './tipos.ts';
 import { extrairZip } from './zip.ts';
@@ -51,21 +52,31 @@ export function criarArmazem(dataDir: string, banco: Banco) {
     rmSync(antiga, { recursive: true, force: true });
   }
 
-  /** Hash do que a revisora vê: textos do manifesto + arquivos da peça, imagens e texto. */
-  function hashConteudo(dir: string, c: Conteudo): string {
-    const h = createHash('sha1');
-    h.update(JSON.stringify({ ...c, pasta: undefined }));
-    for (const r of [...c.pecas.map((p) => p.html), ...c.imagens]) {
-      h.update(r);
-      h.update(readFileSync(join(dir, r)));
-    }
-    return h.digest('hex');
+  const sha1 = (dados: string | Buffer) => createHash('sha1').update(dados).digest('hex');
+
+  /** Hash de cada item que a revisora vê: os textos juntos, cada peça e cada imagem. */
+  function hashesDosItens(dir: string, c: Conteudo): Map<string, string> {
+    const textos = [
+      c.titulo, c.objetivo, c.introducao, c.conteudoPlanejado, c.texto ?? '', c.formato, c.duracao,
+      c.tags.join('|'), c.relacionados, c.chancela, c.observacoes, c.modificacao,
+    ];
+    const m = new Map<string, string>([[ITEM_TEXTO, sha1(JSON.stringify(textos))]]);
+    for (const p of c.pecas) m.set(itemPeca(p.html), sha1(readFileSync(join(dir, p.html))));
+    for (const i of c.imagens) m.set(itemImagem(i), sha1(readFileSync(join(dir, i))));
+    return m;
+  }
+
+  /** Registra a versão do conteúdo e de cada item; devolve true se o conteúdo mudou. */
+  function registrarConteudo(projetoId: number, chave: string, dir: string, c: Conteudo): boolean {
+    const itens = hashesDosItens(dir, c);
+    for (const [item, hash] of itens) banco.registrarVersaoItem(projetoId, chave, c.id, item, hash);
+    return banco.registrarVersao(projetoId, chave, c.id, sha1(JSON.stringify([...itens])));
   }
 
   function registrarVersoes(projetoId: number, l: Lote, dir: string, existia: boolean): string[] {
     const atualizados: string[] = [];
     for (const c of Object.values(l.conteudos))
-      if (banco.registrarVersao(projetoId, l.chave, c.id, hashConteudo(dir, c)) && existia) atualizados.push(c.id);
+      if (registrarConteudo(projetoId, l.chave, dir, c) && existia) atualizados.push(c.id);
     return atualizados;
   }
 
@@ -142,7 +153,11 @@ export function criarArmazem(dataDir: string, banco: Banco) {
     if (!id) throw new Error('O conteudo.json do ZIP não tem id.');
 
     const candidatos = banco.lotes(u.projeto.id).filter((l) => !u.lote || l.chave === u.lote || l.nome === u.lote);
-    for (const info of candidatos) {
+    const comEsteId: typeof candidatos = [];
+    for (const info of candidatos) if ((await lote(u.projeto.slug, info.chave)).conteudos[id]) comEsteId.push(info);
+    if (comEsteId.length > 1)
+      throw new Error(`${id} está em mais de um lote (${comEsteId.map((l) => l.nome).join(', ')}). Escolha no campo "Lote" qual deles atualizar.`);
+    for (const info of comEsteId) {
       const atual = await lote(u.projeto.slug, info.chave);
       const c = atual.conteudos[id];
       if (!c) continue;
@@ -153,7 +168,7 @@ export function criarArmazem(dataDir: string, banco: Banco) {
       cache.delete(`${u.projeto.slug}/${info.chave}`);
       const recarregado = await lote(u.projeto.slug, info.chave);
       const conteudo = recarregado.conteudos[id];
-      const mudou = conteudo ? banco.registrarVersao(u.projeto.id, info.chave, id, hashConteudo(dir, conteudo)) : false;
+      const mudou = conteudo ? registrarConteudo(u.projeto.id, info.chave, dir, conteudo) : false;
       banco.tocarLote(u.projeto.id, info.chave);
       return {
         tipo: 'conteudo',

@@ -16,6 +16,8 @@
   --pendente-claro: #eceef1;
   --erro: #b42318;
   --info-claro: #eef2fb;
+  --versao: #3b4f8a;
+  --versao-borda: #c9d3f0;
   --raio: 12px;
   --sombra: 0 1px 2px rgb(0 0 0 / 6%), 0 1px 8px rgb(0 0 0 / 4%);
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -216,3 +218,19 @@ input[type='file'] { width: 100%; padding: 0.5rem 0; }
 .rodape-perigo { margin-top: 2rem; text-align: right; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ---------- versões e "Aprovado" por item ---------- */
+.selo-versao {
+  display: inline-block; padding: 0.1rem 0.55rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap;
+  background: var(--info-claro); color: var(--versao); border: 1px solid var(--versao-borda);
+}
+.selo-versao-mini { margin-left: 0.35rem; padding: 0 0.4rem; font-family: system-ui, sans-serif; }
+.titulo-com-selo { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.imagem-numero { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.etiqueta-versao { background: var(--info-claro); color: var(--versao); }
+.aprovar-item { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.6rem; margin-right: auto; }
+.aprovado-por-mim { display: inline-flex; align-items: center; gap: 0.25rem; }
+.botao-aprovado { background: var(--superficie); color: var(--aprovado); border-color: var(--aprovado); }
+.botao-aprovado.ativo { background: var(--aprovado); color: #fff; opacity: 1; cursor: default; }
+.secao.aprovada, .imagem.aprovada img { border-color: var(--aprovado); box-shadow: 0 0 0 1px var(--aprovado); }
+.acoes-peca { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }

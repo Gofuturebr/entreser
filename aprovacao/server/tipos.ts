@@ -84,6 +84,27 @@ export type Apontamento = {
   texto: string;
   criadoEm: string;
   resolvidoEm: string | null;
+  /** Versão do item (texto, imagem) ou do conteúdo (formato) quando o apontamento foi feito. */
+  versao: number | null;
+  /** Versão atual do mesmo item; maior que `versao` quando já veio correção. */
+  versaoAtual: number | null;
+};
+
+export type AprovacaoItem = {
+  revisoraId: number;
+  revisora: string;
+  /** Versão que a revisora aprovou. */
+  versao: number;
+  em: string;
+  /** O item mudou depois da aprovação. */
+  desatualizada: boolean;
+};
+
+/** Estado de um item revisável (texto, peça ou imagem). */
+export type ItemRevisao = {
+  versao: number;
+  atualizadoEm: string | null;
+  aprovacoes: AprovacaoItem[];
 };
 
 export type ResumoConteudo = {
@@ -91,6 +112,8 @@ export type ResumoConteudo = {
   decisoes: Decisao[];
   abertos: number;
   atualizadoEm: string | null;
+  /** Número da versão do conteúdo (1 no primeiro envio; sobe a cada envio com mudança). */
+  versao: number;
 };
 
 export type ResumoLote = {
@@ -116,6 +139,8 @@ export type DetalheConteudo = {
   tema: { id: string; titulo: string } | null;
   resumo: ResumoConteudo;
   apontamentos: Apontamento[];
+  /** Por chave de item (ver server/itens.ts). */
+  itens: Record<string, ItemRevisao>;
 };
 
 export type ResultadoUpload = {

@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { Apontamento, ProjetoAdmin as Projeto, ResultadoUpload, ResumoLote, Revisora } from '../../../../server/tipos.ts';
 import { admin, api, urlArquivo } from '../../api.ts';
 import { dataCurta, mensagem, nomeArquivo, useCarregar } from '../../util.ts';
+import { VersaoDoApontamento } from '../../componentes/Apontamentos.tsx';
 import { ordemDeLeitura, rota } from '../cliente/contexto.ts';
 import { ComSenha } from './Entrada.tsx';
 
@@ -390,6 +391,7 @@ function Apontamentos({ slug, lotes, revisoras, lista, aoMudar }: { slug: string
                     <span className="etiqueta">{a.alvo === 'imagem' ? 'Imagem' : a.alvo === 'formato' ? 'Formato' : 'Texto'}</span>
                     <strong>{a.revisora}</strong>
                     <span>{dataCurta(a.criadoEm)}</span>
+                    <VersaoDoApontamento a={a} />
                     <label className="resolver">
                       <input type="checkbox" checked={!!a.resolvidoEm} onChange={() => alternar(a)} /> resolvido
                     </label>

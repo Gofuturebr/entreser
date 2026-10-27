@@ -4,11 +4,12 @@ import { join } from 'node:path';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import multer from 'multer';
 import type { Armazem } from './armazem.ts';
-import type { Banco, DecisaoLinha, ProjetoLinha } from './db.ts';
+import type { Banco, DecisaoLinha, ProjetoLinha, VersaoLinha } from './db.ts';
 import { exportarCsv, exportarMarkdown } from './exportar.ts';
+import { itemDoApontamento, itensDoConteudo } from './itens.ts';
 import { slug } from './lote.ts';
 import type {
-  Alvo, Apontamento, DetalheConteudo, Lote, ProjetoAdmin, ProjetoPublico, ResumoConteudo, ResumoLote, StatusDecisao,
+  Alvo, Apontamento, DetalheConteudo, ItemRevisao, Lote, ProjetoAdmin, ProjetoPublico, ResumoConteudo, ResumoLote, StatusDecisao,
 } from './tipos.ts';
 
 export class ErroUsuario extends Error {
@@ -23,7 +24,8 @@ type Opcoes = { banco: Banco; armazem: Armazem; senhaAdmin: string; dataDir: str
 const ALVOS: Alvo[] = ['texto', 'formato', 'imagem'];
 const LIMITE_TEXTO = 5000;
 
-function resumir(id: string, decisoes: DecisaoLinha[], apontamentos: Apontamento[], atualizadoEm: string | null): ResumoConteudo {
+function resumir(id: string, decisoes: DecisaoLinha[], apontamentos: Apontamento[], versao: VersaoLinha | null): ResumoConteudo {
+  const atualizadoEm = versao?.atualizadoEm ?? null;
   const ds = decisoes
     .filter((d) => d.conteudoId === id)
     .map((d) => ({
@@ -36,7 +38,7 @@ function resumir(id: string, decisoes: DecisaoLinha[], apontamentos: Apontamento
   const abertos = apontamentos.filter((a) => a.conteudoId === id && !a.resolvidoEm).length;
   const validas = ds.filter((d) => !d.desatualizada);
   const status = abertos > 0 || validas.some((d) => d.status === 'ajustes') ? 'ajustes' : validas.some((d) => d.status === 'aprovado') ? 'aprovado' : 'pendente';
-  return { status, decisoes: ds, abertos, atualizadoEm };
+  return { status, decisoes: ds, abertos, atualizadoEm, versao: versao?.numero ?? 1 };
 }
 
 export function criarApp({ banco, armazem, senhaAdmin, dataDir }: Opcoes) {
@@ -59,6 +61,27 @@ export function criarApp({ banco, armazem, senhaAdmin, dataDir }: Opcoes) {
 
   const param = (req: Request, nome: string) => String(req.params[nome] ?? '');
 
+  /** Versão atual do item de um apontamento (ou do conteúdo, para ajuste de formato). */
+  const versaoAtual = (p: ProjetoLinha, chave: string, conteudoId: string, alvo: Alvo, imagem: string | null): number | null => {
+    const item = itemDoApontamento(alvo, imagem);
+    return (item ? banco.versoesItens(p.id, chave, conteudoId).get(item) : banco.versoes(p.id, chave).get(conteudoId))?.numero ?? null;
+  };
+
+  /** Preenche `versaoAtual` dos apontamentos (lendo as versões uma vez por lote). */
+  const comVersaoAtual = (p: ProjetoLinha, aps: Apontamento[]): Apontamento[] => {
+    const porLote = new Map<string, { itens: Map<string, VersaoLinha>; conteudos: Map<string, VersaoLinha> }>();
+    return aps.map((a) => {
+      let v = porLote.get(a.lote);
+      if (!v) {
+        v = { itens: banco.versoesItens(p.id, a.lote), conteudos: banco.versoes(p.id, a.lote) };
+        porLote.set(a.lote, v);
+      }
+      const item = itemDoApontamento(a.alvo, a.imagem);
+      const atual = item ? v.itens.get(`${a.conteudoId}\u0000${item}`) : v.conteudos.get(a.conteudoId);
+      return { ...a, versaoAtual: atual?.numero ?? null };
+    });
+  };
+
   const detalhe = async (p: ProjetoLinha, chave: string, id: string): Promise<DetalheConteudo> => {
     const l = await loteOu404(p, chave);
     const c = l.conteudos[id];
@@ -66,8 +89,22 @@ export function criarApp({ banco, armazem, senhaAdmin, dataDir }: Opcoes) {
     const info = banco.lotes(p.id).find((x) => x.chave === chave);
     const trilha = l.trilhas.find((t) => t.id === c.trilhaId);
     const tema = trilha?.temas.find((t) => t.id === c.temaId);
-    const apontamentos = banco.apontamentos(p.id, { lote: chave, conteudoId: id });
+    const apontamentos = comVersaoAtual(p, banco.apontamentos(p.id, { lote: chave, conteudoId: id }));
     const versao = banco.versoes(p.id, chave).get(id) ?? null;
+    const versoesItens = banco.versoesItens(p.id, chave, id);
+    const aprovacoes = banco.aprovacoesItens(p.id, chave, id);
+    const itens: Record<string, ItemRevisao> = {};
+    for (const item of itensDoConteudo(c)) {
+      const v = versoesItens.get(item);
+      const numero = v?.numero ?? 1;
+      itens[item] = {
+        versao: numero,
+        atualizadoEm: v?.atualizadoEm ?? null,
+        aprovacoes: aprovacoes
+          .filter((a) => a.item === item)
+          .map((a) => ({ revisoraId: a.revisoraId, revisora: a.revisora, versao: a.numero, em: a.em, desatualizada: a.numero < numero })),
+      };
+    }
     return {
       lote: { chave, nome: info?.nome ?? l.nome },
       conteudo: c,
@@ -75,6 +112,7 @@ export function criarApp({ banco, armazem, senhaAdmin, dataDir }: Opcoes) {
       tema: tema ? { id: tema.id, titulo: tema.titulo } : null,
       resumo: resumir(id, banco.decisoes(p.id, chave), apontamentos, versao),
       apontamentos,
+      itens,
     };
   };
 
@@ -144,7 +182,8 @@ export function criarApp({ banco, armazem, senhaAdmin, dataDir }: Opcoes) {
       imagem = String(corpo.imagem ?? '');
       if (!atual.conteudo.imagens.includes(imagem)) throw new ErroUsuario('Esta imagem não está mais no conteúdo; recarregue a página.');
     }
-    banco.criarApontamento({ projetoId: p.id, lote: chave, conteudoId: id, alvo, imagem, revisoraId, texto });
+    const versao = versaoAtual(p, chave, id, alvo, imagem);
+    banco.criarApontamento({ projetoId: p.id, lote: chave, conteudoId: id, alvo, imagem, revisoraId, texto, versao });
     res.status(201).json(await detalhe(p, chave, id));
   });
 
@@ -158,6 +197,21 @@ export function criarApp({ banco, armazem, senhaAdmin, dataDir }: Opcoes) {
     const status = corpo.status === null ? null : (corpo.status as StatusDecisao);
     if (status !== null && status !== 'aprovado' && status !== 'ajustes') throw new ErroUsuario('Decisão desconhecida.');
     banco.decidir(p.id, chave, id, revisoraId, status);
+    res.json(await detalhe(p, chave, id));
+  });
+
+  // "Aprovado" num item (texto, peça ou imagem), guardando a versão aprovada.
+  app.put('/api/p/:slug/l/:lote/c/:id/itens', async (req, res) => {
+    const p = projetoOu404(param(req, 'slug'));
+    const chave = param(req, 'lote');
+    const id = param(req, 'id');
+    const atual = await detalhe(p, chave, id);
+    const corpo = (req.body ?? {}) as Record<string, unknown>;
+    const revisoraId = revisoraValida(p, corpo.revisoraId);
+    const item = String(corpo.item ?? '');
+    const info = atual.itens[item];
+    if (!info) throw new ErroUsuario('Este item não está mais no conteúdo; recarregue a página.');
+    banco.aprovarItem({ projetoId: p.id, lote: chave, conteudoId: id, item, revisoraId, numero: info.versao }, corpo.aprovado !== false);
     res.json(await detalhe(p, chave, id));
   });
 
@@ -295,7 +349,8 @@ export function criarApp({ banco, armazem, senhaAdmin, dataDir }: Opcoes) {
   });
 
   app.get('/api/admin/projetos/:slug/apontamentos', (req, res) => {
-    res.json(banco.apontamentos(projetoOu404(param(req, 'slug')).id));
+    const p = projetoOu404(param(req, 'slug'));
+    res.json(comVersaoAtual(p, banco.apontamentos(p.id)));
   });
 
   app.patch('/api/admin/projetos/:slug/apontamentos/:id', (req, res) => {
@@ -319,7 +374,7 @@ export function criarApp({ banco, armazem, senhaAdmin, dataDir }: Opcoes) {
     const entrada = {
       projeto: p.nome,
       lotes,
-      apontamentos: banco.apontamentos(p.id).filter((a) => comResolvidos || !a.resolvidoEm),
+      apontamentos: comVersaoAtual(p, banco.apontamentos(p.id)).filter((a) => comResolvidos || !a.resolvidoEm),
       decisoes: banco.decisoes(p.id),
     };
     const csv = req.query.formato === 'csv';

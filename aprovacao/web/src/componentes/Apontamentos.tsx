@@ -1,4 +1,4 @@
-import { useId, useState, type FormEvent } from 'react';
+import { useId, useState, type FormEvent, type ReactNode } from 'react';
 import type { Alvo, Apontamento } from '../../../server/tipos.ts';
 import { dataCurta, mensagem } from '../util.ts';
 
@@ -15,11 +15,22 @@ export function ListaApontamentos({ itens, mostrarAlvo = false }: { itens: Apont
             <strong>{a.revisora}</strong>
             <span>{dataCurta(a.criadoEm)}</span>
             {a.resolvidoEm && <span className="etiqueta etiqueta-ok">resolvido</span>}
+            <VersaoDoApontamento a={a} />
           </div>
           <p>{a.texto}</p>
         </li>
       ))}
     </ul>
+  );
+}
+
+/** "feito na v1 · já há v2" quando o item foi corrigido depois do apontamento. */
+export function VersaoDoApontamento({ a }: { a: Apontamento }) {
+  if (a.versao === null || a.versaoAtual === null || a.versaoAtual <= a.versao) return null;
+  return (
+    <span className="etiqueta etiqueta-versao">
+      feito na v{a.versao} · já há v{a.versaoAtual}
+    </span>
   );
 }
 
@@ -29,9 +40,11 @@ type Props = {
   rotulo: string;
   dica: string;
   aoEnviar: (alvo: Alvo, texto: string) => Promise<void>;
+  /** Conteúdo extra à esquerda na linha de ações (ex.: botão "Aprovado"). */
+  extra?: ReactNode;
 };
 
-export function FormApontamento({ alvos, rotulo, dica, aoEnviar }: Props) {
+export function FormApontamento({ alvos, rotulo, dica, aoEnviar, extra }: Props) {
   const [alvo, setAlvo] = useState<Alvo>(alvos[0] ?? 'texto');
   const [texto, setTexto] = useState('');
   const [enviando, setEnviando] = useState(false);
@@ -70,6 +83,7 @@ export function FormApontamento({ alvos, rotulo, dica, aoEnviar }: Props) {
       )}
       <textarea id={id} value={texto} onChange={(e) => setTexto(e.target.value)} placeholder={dica} rows={3} maxLength={5000} />
       <div className="form-acoes">
+        {extra}
         {erro && <span className="erro">{erro}</span>}
         {ok && <span className="ok">Apontamento registrado.</span>}
         <button type="submit" className="botao" disabled={!texto.trim() || enviando}>

@@ -32,6 +32,10 @@ function emOrdem(l: Lote) {
   return out;
 }
 
+/** "v1 (já há v2)" quando o item foi corrigido depois do apontamento. */
+const versao = (a: Apontamento) =>
+  a.versao === null ? '' : a.versaoAtual !== null && a.versaoAtual > a.versao ? `v${a.versao} (já há v${a.versaoAtual})` : `v${a.versao}`;
+
 const alvo = (a: Apontamento) => (a.alvo === 'imagem' && a.imagem ? `Imagem ${posix.basename(a.imagem)}` : ROTULO_ALVO[a.alvo]);
 
 export function exportarMarkdown(e: Entrada): string {
@@ -49,7 +53,10 @@ export function exportarMarkdown(e: Entrada): string {
       if (decs.length) blocos.push('', `Decisões: ${decs.map((d) => `${d.revisora} ${ROTULO_DECISAO[d.status]} (${data(d.em)})`).join(' · ')}`);
       blocos.push('');
       for (const a of aps)
-        blocos.push(`- **${alvo(a)}** · ${a.revisora} · ${data(a.criadoEm)}${a.resolvidoEm ? ' · resolvido' : ''}`, `  ${a.texto.replace(/\n+/g, '\n  ')}`);
+        blocos.push(
+          `- **${alvo(a)}** · ${a.revisora} · ${data(a.criadoEm)}${versao(a) ? ` · ${versao(a)}` : ''}${a.resolvidoEm ? ' · resolvido' : ''}`,
+          `  ${a.texto.replace(/\n+/g, '\n  ')}`,
+        );
       blocos.push('');
     }
     if (blocos.length) linhas.push(`## ${l.nome}`, '', ...blocos);
@@ -60,7 +67,7 @@ export function exportarMarkdown(e: Entrada): string {
 const celula = (v: string) => (/[;"\n\r]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
 
 export function exportarCsv(e: Entrada): string {
-  const cab = ['Lote', 'ID', 'Título', 'Trilha', 'Tema', 'Alvo', 'Imagem', 'Revisora', 'Data', 'Apontamento', 'Resolvido em'];
+  const cab = ['Lote', 'ID', 'Título', 'Trilha', 'Tema', 'Alvo', 'Imagem', 'Revisora', 'Data', 'Apontamento', 'Resolvido em', 'Versão', 'Versão atual'];
   const linhas = [cab.join(';')];
   for (const l of e.lotes)
     for (const { id, trilha, tema } of emOrdem(l))
@@ -69,6 +76,7 @@ export function exportarCsv(e: Entrada): string {
           [
             l.nome, id, l.conteudos[id]?.titulo ?? '', trilha, tema, ROTULO_ALVO[a.alvo],
             a.imagem ? posix.basename(a.imagem) : '', a.revisora, data(a.criadoEm), a.texto, a.resolvidoEm ? data(a.resolvidoEm) : '',
+            a.versao === null ? '' : `v${a.versao}`, a.versaoAtual === null ? '' : `v${a.versaoAtual}`,
           ].map(celula).join(';'),
         );
   return `\uFEFF${linhas.join('\r\n')}\r\n`;

@@ -38,7 +38,10 @@ export function Trilha() {
               return (
                 <li key={`${i.id}-${i.ref}`}>
                   <Link to={rota.conteudo(projeto.slug, lote.chave, i.id)} className="linha-conteudo">
-                    <span className="mono">{i.id}</span>
+                    <span className="mono">
+                      {i.id}
+                      {c && c.versao > 1 && <span className="selo-versao selo-versao-mini">v{c.versao}</span>}
+                    </span>
                     <span className="linha-titulo">
                       {i.titulo}
                       {c?.formato && <small>{c.formato}</small>}

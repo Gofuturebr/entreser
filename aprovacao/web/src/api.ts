@@ -36,6 +36,8 @@ export const api = {
   conteudo: (slug: string, lote: string, id: string) => pedir<DetalheConteudo>(`/api/p/${enc(slug)}/l/${enc(lote)}/c/${enc(id)}`),
   apontar: (slug: string, lote: string, id: string, corpo: { revisoraId: number; alvo: Alvo; imagem?: string; texto: string }) =>
     pedir<DetalheConteudo>(`/api/p/${enc(slug)}/l/${enc(lote)}/c/${enc(id)}/apontamentos`, comJson('POST', corpo)),
+  aprovarItem: (slug: string, lote: string, id: string, revisoraId: number, item: string, aprovado: boolean) =>
+    pedir<DetalheConteudo>(`/api/p/${enc(slug)}/l/${enc(lote)}/c/${enc(id)}/itens`, comJson('PUT', { revisoraId, item, aprovado })),
   decidir: (slug: string, lote: string, id: string, revisoraId: number, status: StatusDecisao | null) =>
     pedir<DetalheConteudo>(`/api/p/${enc(slug)}/l/${enc(lote)}/c/${enc(id)}/decisao`, comJson('PUT', { revisoraId, status })),
 };
